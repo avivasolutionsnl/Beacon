@@ -17,30 +17,32 @@ namespace Beacon
 
         public void SetLed(byte led, bool turnItOn, bool flashIt, int? flashDurationInSeconds, bool turnOffAfterFlashing)
         {
-            var hUsb = GetDelcomDeviceHandle(); // open the device
-            if (hUsb == 0) return;
+            uint deviceHandle = GetDelcomDeviceHandle(); // open the device
+            if (deviceHandle == 0) return;
+
             if (turnItOn)
             {
                 if (flashIt)
                 {
-                    DelcomBuildIndicator.DelcomLEDControl(hUsb, led, DelcomBuildIndicator.LEDFLASH);
+                    DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, DelcomBuildIndicator.LEDFLASH);
                     if (flashDurationInSeconds.HasValue)
                     {
-                        Thread.Sleep(flashDurationInSeconds.Value*1000);
+                        Thread.Sleep(flashDurationInSeconds.Value * 1000);
                         var ledStatus = turnOffAfterFlashing ? DelcomBuildIndicator.LEDOFF : DelcomBuildIndicator.LEDON;
-                        DelcomBuildIndicator.DelcomLEDControl(hUsb, led, ledStatus);
+                        DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, ledStatus);
                     }
                 }
                 else
                 {
-                    DelcomBuildIndicator.DelcomLEDControl(hUsb, led, DelcomBuildIndicator.LEDON);
+                    DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, DelcomBuildIndicator.LEDON);
                 }
             }
             else
             {
-                DelcomBuildIndicator.DelcomLEDControl(hUsb, led, DelcomBuildIndicator.LEDOFF);
+                DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, DelcomBuildIndicator.LEDOFF);
             }
-            DelcomBuildIndicator.DelcomCloseDevice(hUsb);
+
+            DelcomBuildIndicator.DelcomCloseDevice(deviceHandle);
         }
 
         private readonly StringBuilder deviceName = new StringBuilder(DelcomBuildIndicator.MAXDEVICENAMELEN);

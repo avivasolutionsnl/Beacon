@@ -9,6 +9,9 @@ namespace Beacon
 {
     internal class Program
     {
+        private const string ConfigFileName = @"config.xml";
+        private const string ConfigFolder = "TeamFlash";
+
         private static void Main()
         {
             Logger.VerboseEnabled = PromptForVerboseMode();
@@ -27,7 +30,7 @@ namespace Beacon
 
             var buildTypeIds = teamFlashConfig.BuildTypeIds == "*"
                 ? new string[0]
-                : teamFlashConfig.BuildTypeIds.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToArray();
+                : teamFlashConfig.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
 
 #if __MonoCS__
             var buildLight = new Linux.BuildLight();
@@ -84,17 +87,17 @@ namespace Beacon
         private static Config LoadConfig()
         {
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var configFilePath = Path.Combine(appDataPath, @"TeamFlash\config.json");
+            var configFilePath = Path.Combine(appDataPath, ConfigFolder, ConfigFileName);
             try
             {
                 if (!File.Exists(configFilePath)) return new Config();
 
                 Logger.WriteLine("Reading config values from: {0}", configFilePath);
 
-                var serializer = new XmlSerializer(typeof (Config));
+                var serializer = new XmlSerializer(typeof(Config));
                 using (var stream = File.OpenRead(configFilePath))
                 {
-                    return (Config) serializer.Deserialize(stream);
+                    return (Config)serializer.Deserialize(stream);
                 }
             }
             catch (Exception ex)
@@ -103,19 +106,23 @@ namespace Beacon
                     "The following exception occurred loading the config file \"{0}\":{2}Message: {1}{2}Feel free to quit and fix it or re-enter your server details...",
                     configFilePath, ex.Message, Environment.NewLine);
             }
+
             return new Config();
         }
 
         private static void SaveConfig(Config config)
         {
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var teamFlashPath = Path.Combine(appDataPath, @"TeamFlash\");
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string teamFlashPath = Path.Combine(appDataPath, ConfigFolder);
+
             if (!Directory.Exists(teamFlashPath))
+            {
                 Directory.CreateDirectory(teamFlashPath);
+            }
 
-            var configFilePath = Path.Combine(teamFlashPath, @"config.json");
+            string configFilePath = Path.Combine(teamFlashPath, ConfigFileName);
 
-            var serializer = new XmlSerializer(typeof (Config));
+            XmlSerializer serializer = new XmlSerializer(typeof(Config));
             using (var stream = File.OpenWrite(configFilePath))
             {
                 serializer.Serialize(stream, config);
