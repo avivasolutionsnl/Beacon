@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using System.Threading;
 
-namespace Beacon
+namespace Beacon.Lights.Delcom
 {
-    internal class Monitor
+    internal class DelcomLed
     {
         public void SetLed(byte led, bool turnItOn, bool flashIt)
         {
@@ -24,38 +24,38 @@ namespace Beacon
             {
                 if (flashIt)
                 {
-                    DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, DelcomBuildIndicator.LEDFLASH);
+                    DelcomApis.DelcomLEDControl(deviceHandle, led, DelcomApis.LEDFLASH);
                     if (flashDurationInSeconds.HasValue)
                     {
                         Thread.Sleep(flashDurationInSeconds.Value * 1000);
-                        var ledStatus = turnOffAfterFlashing ? DelcomBuildIndicator.LEDOFF : DelcomBuildIndicator.LEDON;
-                        DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, ledStatus);
+                        var ledStatus = turnOffAfterFlashing ? DelcomApis.LEDOFF : DelcomApis.LEDON;
+                        DelcomApis.DelcomLEDControl(deviceHandle, led, ledStatus);
                     }
                 }
                 else
                 {
-                    DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, DelcomBuildIndicator.LEDON);
+                    DelcomApis.DelcomLEDControl(deviceHandle, led, DelcomApis.LEDON);
                 }
             }
             else
             {
-                DelcomBuildIndicator.DelcomLEDControl(deviceHandle, led, DelcomBuildIndicator.LEDOFF);
+                DelcomApis.DelcomLEDControl(deviceHandle, led, DelcomApis.LEDOFF);
             }
 
-            DelcomBuildIndicator.DelcomCloseDevice(deviceHandle);
+            DelcomApis.DelcomCloseDevice(deviceHandle);
         }
 
-        private readonly StringBuilder deviceName = new StringBuilder(DelcomBuildIndicator.MAXDEVICENAMELEN);
+        private readonly StringBuilder deviceName = new StringBuilder(DelcomApis.MAXDEVICENAMELEN);
 
         private uint GetDelcomDeviceHandle()
         {
             if (string.IsNullOrEmpty(deviceName.ToString()))
             {
                 // Search for the first match USB device, For USB IO Chips use USBIODS
-                DelcomBuildIndicator.DelcomGetNthDevice(DelcomBuildIndicator.USBDELVI, 0, deviceName);
+                DelcomApis.DelcomGetNthDevice(DelcomApis.USBDELVI, 0, deviceName);
             }
 
-            var hUsb = DelcomBuildIndicator.DelcomOpenDevice(deviceName, 0); // open the device
+            var hUsb = DelcomApis.DelcomOpenDevice(deviceName, 0); // open the device
             return hUsb;
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Beacon
+﻿namespace Beacon.Core
 {
     public class Config
     {

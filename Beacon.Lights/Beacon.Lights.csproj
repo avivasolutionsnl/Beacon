@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{936141A6-3390-44FC-9829-1144D5214ECB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{E0739ADF-2B24-40AC-A368-293C0A98DBDA}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Beacon</RootNamespace>
-    <AssemblyName>Beacon</AssemblyName>
+    <RootNamespace>Beacon.Lights</RootNamespace>
+    <AssemblyName>Beacon.Lights</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommandLine">
-      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,28 +39,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Options.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Console\ConsoleBuildLight.cs" />
+    <Compile Include="Delcom\DelcomApis.cs" />
+    <Compile Include="Delcom\DelcomLed.cs" />
+    <Compile Include="Delcom\DelcomLight.cs" />
+    <Compile Include="LightFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Beacon.Core\Beacon.Core.csproj">
-      <Project>{e76813ef-60ad-4955-a273-c2a235dfe9fc}</Project>
+      <Project>{E76813EF-60AD-4955-A273-C2A235DFE9FC}</Project>
       <Name>Beacon.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Beacon.Lights\Beacon.Lights.csproj">
-      <Project>{e0739adf-2b24-40ac-a368-293c0a98dbda}</Project>
-      <Name>Beacon.Lights</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="DelcomDLL.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

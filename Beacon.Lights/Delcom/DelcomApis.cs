@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Beacon
+namespace Beacon.Lights.Delcom
 {
-    internal class DelcomBuildIndicator
+    internal static class DelcomApis
     {
         // Delcom USB Devices
         public const uint USBIODS = 1;

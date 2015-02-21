@@ -7,7 +7,7 @@ using System.Net;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Beacon
+namespace Beacon.Core
 {
     public class Query : DynamicObject, IEnumerable
     {
