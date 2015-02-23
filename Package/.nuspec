@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<package> 
+  <metadata> 
+    <id>beacon</id>
+    <title>Beacon</title>
+    <version>0.2.0-unstable0006</version>
+    <owners>Dennis Doomen</owners>
+    <authors>Dennis Doomen</authors>
+    <summary>
+		Monitors TeamCity builds and uses that to control a Delcom USB LED light
+    </summary>
+    <description>
+		Just run "beacon" from a command prompt to see the command-line arguments and start monitoring your builds. 
+    </description> 
+    <language>en-US</language>
+    <licenseUrl>https://github.com/dennisdoomen/beacon/blob/develop/LICENSE</licenseUrl>    
+    <projectUrl>https://github.com/dennisdoomen/beacon</projectUrl>
+    <tags>teamcity; build-monitoring; delcom</tags>
+    <copyright>Copyright Dennis Doomen 2015</copyright>
+    <releaseNotes>
+      See https://github.com/dennisdoomen/beacon/releases
+    </releaseNotes>
+  </metadata>
+  <files>
+    <file src="Output\**" target="tools" />
+  </files>
+</package>
