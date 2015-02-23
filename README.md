@@ -1,7 +1,7 @@
 # Beacon
 A TeamCity monitoring tool that uses a Delcom USB LED light to notify your teams
 
-![](./Images/screenshot.png)  
+![Chocolate](./Images/Screenshot.png)  
 
 # Backlog
 * Support for configuring the RGB values, flash mode and power level of the LED
