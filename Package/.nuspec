@@ -10,15 +10,20 @@
 		Monitors TeamCity builds and uses that to control a Delcom USB LED light
     </summary>
     <description>
-		Just run "beacon" from a command prompt to see the command-line arguments and start monitoring your builds. 
+Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) to a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
+
+To get started just run the following command-line:
+
+	beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc
+
     </description> 
     <language>en-US</language>
     <licenseUrl>https://github.com/dennisdoomen/beacon/blob/develop/LICENSE</licenseUrl>    
     <projectUrl>https://github.com/dennisdoomen/beacon</projectUrl>
-    <tags>teamcity; build-monitoring; delcom</tags>
+    <tags>teamcity build-monitoring delcom ci continuous integration</tags>
     <copyright>Copyright Dennis Doomen 2015</copyright>
     <releaseNotes>
-      See https://github.com/dennisdoomen/beacon/releases
+This first version is still a bit rudimentary, but keep an eye on the project site to see some of the things being worked on.
     </releaseNotes>
   </metadata>
   <files>
