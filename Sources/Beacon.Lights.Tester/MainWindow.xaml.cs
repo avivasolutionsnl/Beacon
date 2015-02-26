@@ -43,6 +43,11 @@ namespace Beacon.Lights.Tester
             Device.Investigate();
         }
 
+        private void FixedButton_Click(object sender, RoutedEventArgs e)
+        {
+            Device.Fixed();
+        }
+
         private IBuildLight Device
         {
             get { return lightFactory.CreateLight((string) deviceList.SelectedItem); }

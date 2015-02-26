@@ -34,6 +34,13 @@ namespace Beacon.Lights.Console
             System.Console.ForegroundColor = defaultForegroundColor;
         }
 
+        public void Fixed()
+        {
+            System.Console.ForegroundColor = ConsoleColor.DarkGreen;
+            System.Console.WriteLine("Build is successful");
+            System.Console.ForegroundColor = defaultForegroundColor;
+        }
+
         public void NoStatus()
         {
             System.Console.ForegroundColor = ConsoleColor.DarkGray;

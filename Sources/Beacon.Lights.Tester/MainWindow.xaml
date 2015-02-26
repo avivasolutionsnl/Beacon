@@ -8,10 +8,11 @@
             <ColumnDefinition Width="41*"/>
         </Grid.ColumnDefinitions>
         <ComboBox x:Name="deviceList" HorizontalAlignment="Left" Margin="9,27,0,0" VerticalAlignment="Top" Width="236" Grid.Column="1" Loaded="ComboBox_Loaded"/>
-        <Button x:Name="OffButton" Content="Off" HorizontalAlignment="Left" Margin="60,70,0,0" VerticalAlignment="Top" Width="75" Grid.ColumnSpan="2" Click="OffButton_Click" />
-        <Button x:Name="SuccessButton" Content="Success" HorizontalAlignment="Left" Margin="36,70,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="SuccessButton_Click" />
-        <Button x:Name="InvestigateButton" Content="Investigate" HorizontalAlignment="Left" Margin="196,70,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="InvestigateButton_Click"/>
-        <Button x:Name="FailedButton" Content="Failed" HorizontalAlignment="Left" Margin="116,70,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="FailedButton_Click"/>
+        <Button x:Name="OffButton" Content="Off" HorizontalAlignment="Left" Margin="26,70,0,0" VerticalAlignment="Top" Width="75" Click="OffButton_Click" />
+        <Button x:Name="SuccessButton" Content="Success" HorizontalAlignment="Left" Margin="2,70,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="SuccessButton_Click" />
+        <Button x:Name="InvestigateButton" Content="Investigate" HorizontalAlignment="Left" Margin="162,70,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="InvestigateButton_Click"/>
+        <Button x:Name="FailedButton" Content="Failed" HorizontalAlignment="Left" Margin="82,70,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="FailedButton_Click"/>
         <Label Content="Device:" HorizontalAlignment="Left" Margin="60,23,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <Button x:Name="FixedButton" Content="Fixed" Grid.Column="1" HorizontalAlignment="Left" Margin="245,70,0,0" VerticalAlignment="Top" Width="75" Click="FixedButton_Click"/>
     </Grid>
 </Window>

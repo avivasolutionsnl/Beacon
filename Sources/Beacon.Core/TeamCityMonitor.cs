@@ -27,17 +27,25 @@ namespace Beacon.Core
                         buildLight.NoStatus();
                         Logger.WriteLine("Build status not available");
                         break;
+
                     case BuildStatus.Passed:
                         buildLight.Success();
                         Logger.WriteLine("Passed");
                         break;
+
                     case BuildStatus.Investigating:
                         buildLight.Investigate();
                         Logger.WriteLine("Investigating");
                         break;
+
                     case BuildStatus.Failed:
                         buildLight.Fail();
                         Logger.WriteLine("Failed");
+                        break;
+
+                    case BuildStatus.Fixed:
+                        buildLight.Fixed();
+                        Logger.WriteLine("Fixed");
                         break;
                 }
 
@@ -160,14 +168,22 @@ namespace Beacon.Core
 
                         foreach (var investigation in investigationQuery.Investigations)
                         {
-                            var investigationState = investigation.State;
-                            if ("taken".Equals(investigationState, StringComparison.CurrentCultureIgnoreCase) ||
-                                "fixed".Equals(investigationState, StringComparison.CurrentCultureIgnoreCase))
+                            string investigationState = investigation.State;
+
+                            if ("taken".Equals(investigationState, StringComparison.CurrentCultureIgnoreCase))
                             {
-                                Logger.Verbose(
-                                    "Investigation status of Built Type '{0}\\{1}' detected as either 'taken' or 'fixed'.",
-                                    project.Name, buildType.Name);
+                                Logger.Verbose("Investigation status of Built Type '{0}\\{1}' detected as 'taken'", project.Name,
+                                    buildType.Name);
+
                                 buildStatus = BuildStatus.Investigating;
+                            }
+
+                            if ("fixed".Equals(investigationState, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                Logger.Verbose("Investigation status of Built Type '{0}\\{1}' detected as either 'fixed'.",
+                                    project.Name, buildType.Name);
+
+                                buildStatus = BuildStatus.Fixed;
                             }
                         }
 

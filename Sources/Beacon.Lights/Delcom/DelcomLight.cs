@@ -14,9 +14,17 @@ namespace Beacon.Lights.Delcom
             delcomLed.SetLed(DelcomApis.BLUELED, false, false);
         }
 
+        public void Fixed()
+        {
+            VerboseThemeChange("GREEN");
+            delcomLed.SetLed(DelcomApis.REDLED, false, false);
+            delcomLed.SetLed(DelcomApis.GREENLED, true, false);
+            delcomLed.SetLed(DelcomApis.BLUELED, false, false);
+        }
+
         public void Investigate()
         {
-            VerboseThemeChange("AMBER");
+            VerboseThemeChange("ORANGE");
             delcomLed.SetLed(DelcomApis.REDLED, false, false);
             delcomLed.SetLed(DelcomApis.GREENLED, false, false);
             delcomLed.SetLed(DelcomApis.BLUELED, true, false);
