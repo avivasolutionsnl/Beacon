@@ -204,7 +204,6 @@ namespace Beacon.Core
 
             try
             {
-                Logger.Verbose("Invoking query '{0}'.", queryUrl);
                 using (var stream = client.OpenRead(queryUrl))
                 using (
                     var reader = XmlReader.Create(stream, new XmlReaderSettings {DtdProcessing = DtdProcessing.Ignore}))
