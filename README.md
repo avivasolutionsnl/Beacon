@@ -10,9 +10,9 @@ A TeamCity monitoring tool that uses a Delcom USB LED light to notify your teams
 * Deployment as a Windows Service.
 
 # How to install
-The easiest deployment mechanism is to install [Chocolatey](https://chocolatey.org/) and run the following command-line:
+The easiest deployment mechanism is to install [Chocolatey](https://chocolatey.org/) and run the following command-line to install the [Chocolate package](https://chocolatey.org/packages/beacon):
 
-	choco install beacon -Version 1.0.0
+	choco install beacon
 
 Then run `beacon` and observe the command-line arguments. 
 
