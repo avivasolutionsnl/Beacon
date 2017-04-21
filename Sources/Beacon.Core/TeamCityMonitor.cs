@@ -1,15 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.UI;
+
+using Beacon.Core.Models;
 
 namespace Beacon.Core
 {
-    // REFACTOR the evaluation of multiple statusses and driving the build light should move out of this class, so we can define
-    // an abstraction against TeamCity that we can replace with TFS
     public class TeamCityMonitor
     {
-        public void Start(Config config, string password, IBuildLight buildLight)
+        private readonly Config config;
+        private readonly IBuildLight buildLight;
+        private readonly HttpClient httpClient;
+
+        public TeamCityMonitor(Config config, IBuildLight buildLight)
+        {
+            this.config = config;
+            this.buildLight = buildLight;
+            httpClient = new HttpClient(new HttpClientHandler
+            {
+                Credentials = new NetworkCredential(config.Username, config.Password)
+            });
+
+            httpClient.BaseAddress = new Uri(config.ServerUrl);
+        }
+
+        public async Task Start()
         {
             var buildTypeIds = config.BuildTypeIds == "*"
                 ? new string[0]
@@ -21,7 +41,7 @@ namespace Beacon.Core
 
             while (true)
             {
-                BuildStatus lastBuildStatus = GetBuildStatus(config.ServerUrl, config.Username, password, buildTypeIds);
+                BuildStatus lastBuildStatus = await GetBuildStatus(buildTypeIds);
 
                 switch (lastBuildStatus)
                 {
@@ -51,33 +71,21 @@ namespace Beacon.Core
                         break;
                 }
 
-                Wait();
+                Logger.Verbose($"Waiting for {config.Interval} seconds.");
+                await Task.Delay(config.Interval);
             }
         }
 
-        private static void Wait()
-        {
-            Logger.Verbose("Waiting for 10 seconds.");
-
-            var delayCount = 0;
-            while (delayCount < 10 && !Console.KeyAvailable)
-            {
-                delayCount++;
-                Thread.Sleep(1000);
-            }
-        }
-
-        private static BuildStatus GetBuildStatus(string serverUrl, string username, string password,
-            IEnumerable<string> buildTypeIds)
+        private async Task<BuildStatus> GetBuildStatus(IEnumerable<string> buildTypeIds)
         {
             BuildStatus status = BuildStatus.Unavailable;
 
             try
             {
-                List<BuildStatus> results = GetStatusOfAllBuilds(serverUrl, username, password, buildTypeIds.ToArray());
+                List<BuildStatus> results = await GetStatusOfAllBuilds(buildTypeIds.ToArray());
                 if (!results.Any())
                 {
-                     status = BuildStatus.Unavailable; 
+                    status = BuildStatus.Unavailable;
                 }
                 else if (results.Any(result => result == BuildStatus.Failed))
                 {
@@ -100,142 +108,98 @@ namespace Beacon.Core
             return status;
         }
 
-        private static List<BuildStatus> GetStatusOfAllBuilds(string serverUrl, string username, string password,
-            IEnumerable<string> buildTypeIds)
+        private async Task<List<BuildStatus>> GetStatusOfAllBuilds(IEnumerable<string> buildTypeIds)
         {
             var statusPerBuild = new List<BuildStatus>();
 
-            dynamic query = new Query(serverUrl, username, password);
-
-            bool couldFindProjects = false;
-
-            foreach (var project in query.Projects)
+            foreach (var buildTypeId in buildTypeIds)
             {
-                couldFindProjects = true;
-                if (project.BuildTypesExists)
+                HttpResponseMessage result = await httpClient.GetAsync(
+                    $"httpAuth/app/rest/buildTypes/id:{buildTypeId}");
+
+                if (result.IsSuccessStatusCode)
                 {
-                    foreach (var buildType in project.BuildTypes)
-                    {
-                        if (buildTypeIds.Any() && buildTypeIds.Any(id => id == buildType.Id))
-                        {
-                            BuildStatus? status = GetBuildTypeStatus(serverUrl, username, password, project, buildType);
-                            if (status.HasValue)
-                            {
-                                statusPerBuild.Add(status.Value);
-                            }
-                        }
-                    }
-                }
-            }
+                    var buildType = BuildType.FromXml(await result.Content.ReadAsStringAsync());
 
-            if (!couldFindProjects)
-            {
-                Logger.Verbose(
-                    "No Projects found! Please ensure if TeamCity URL is valid and also TeamCity setup and credentials are correct.");
+                    Logger.Verbose($"Analyzing the builds for '{buildType.Id}' over a period of {config.TimeSpan.Days} days.");
+
+                    BuildStatus? status = await GetBuildTypeStatus(buildType);
+                    if (status.HasValue)
+                    {
+                        statusPerBuild.Add(status.Value);
+                    }
+
+                    Logger.Verbose($"Status of Built Type '{buildType.Id}' is {status ?? BuildStatus.Unavailable}.");
+                }
+                else
+                {
+                    Logger.WriteLine($"Failed to get info for build type {buildTypeId}: {result.StatusCode}");
+                }
             }
 
             return statusPerBuild;
         }
 
-        private static BuildStatus? GetBuildTypeStatus(string serverUrl, string username, string password, dynamic project,
-            dynamic buildType)
+        private async Task<BuildStatus?> GetBuildTypeStatus(BuildType buildType)
         {
-            Logger.Verbose("Analyzing Built Type '{0}\\{1}'.", project.Name, buildType.Name);
-
             BuildStatus? status = null;
 
-            if (buildType.PausedExists && "true".Equals(buildType.Paused, StringComparison.CurrentCultureIgnoreCase))
+            if (buildType.IsPaused)
             {
                 Logger.Verbose("Bypassing because it is paused");
-
                 return null;
             }
 
-            var builds = buildType.Builds;
-            var latestBuild = builds.First;
-            if (latestBuild == null)
+            var fromDate = DateTimeOffset.Now.Subtract(config.TimeSpan);
+            string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
+            
+            string buildsXml = await httpClient.GetStringAsync(
+                    $"httpAuth/app/rest/buildTypes/id:{buildType.Id}/builds?locator=branch:default:any,running:false,sinceDate:{fromDateInTcFormat}");
+
+            var builds = BuildCollection.FromXml(buildsXml);
+            if (builds.IsEmpty)
             {
                 Logger.Verbose("Bypassing because no built history is available for it yet.");
-
                 return null;
             }
 
-            if ("success".Equals(latestBuild.Status, StringComparison.CurrentCultureIgnoreCase))
+            var dictionary = new Dictionary<string, Build>();
+            foreach (Build build in builds)
             {
-                // NOTE Bypassing running build detection to make sure failing builds don't affect the build light until it has compelted
-                //                dynamic runningBuild = new Query(serverUrl, username, password)
-                //                {
-                //                    RestBasePath = string.Format("/httpAuth/app/rest/buildTypes/id:{0}/builds/running:any", buildType.Id)
-                //                };
+                string branch = build.BranchName;
 
-                //                runningBuild.Load();
+                if (!dictionary.ContainsKey(branch) || dictionary[branch].Id < build.Id)
+                {
+                    dictionary[branch] = build;
+                }
+            }
 
-                //                if ("success".Equals(runningBuild.Status, StringComparison.CurrentCultureIgnoreCase))
-                //                {
-                //                    Logger.Verbose(
-                //                        "Bypassing because status of last build and all running builds is success.");
-                //            
-                //                    return BuildStatus.Passed;
-                //                }
-
+            Build firstUnsuccesful = dictionary.Values.FirstOrDefault(v => !v.IsSuccessful);
+            if (firstUnsuccesful == null)
+            {
                 return BuildStatus.Passed;
             }
-
-            if (latestBuild.PropertiesExists)
+            else
             {
-                bool isUnstableBuild = false;
-                foreach (var property in latestBuild.Properties)
-                {
-                    if ("system.BuildState".Equals(property.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                        "unstable".Equals(property.Value, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        isUnstableBuild = true;
-                    }
-
-                    if ("BuildState".Equals(property.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                        "unstable".Equals(property.Value, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        isUnstableBuild = true;
-                    }
-                }
-
-                if (isUnstableBuild)
-                {
-                    Logger.Verbose("Bypassing because it is marked as unstable.");
-
-                    return null;
-                }
+                Logger.Verbose($"Build from branch {firstUnsuccesful.BranchName}(id: {firstUnsuccesful.Id}) failed");
             }
 
-            Logger.Verbose("Now checking investigation status.");
-            var buildId = buildType.Id;
-            dynamic investigationQuery = new Query(serverUrl, username, password);
-            investigationQuery.RestBasePath = @"/httpAuth/app/rest/buildTypes/id:" + buildId + @"/";
+            if (buildType.IsUnstable)
+            {
+                Logger.Verbose("Bypassing because it is marked as unstable.");
+                return null;
+            }
 
             status = BuildStatus.Failed;
 
-            foreach (var investigation in investigationQuery.Investigations)
-            {
-                string investigationState = investigation.State;
+            Logger.Verbose("Now checking investigation status.");
 
-                if ("taken".Equals(investigationState, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    Logger.Verbose("Investigation status detected as 'taken'");
+            string investigationsXml =
+                await httpClient.GetStringAsync($"/httpAuth/app/rest/investigations?locator=buildType:(id:{buildType.Id})");
 
-                    status = BuildStatus.Investigating;
-                }
+            var investigation = Investigation.FromXml(investigationsXml);
 
-                if ("fixed".Equals(investigationState, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    Logger.Verbose("Investigation status detected as 'fixed'.");
-
-                    status = BuildStatus.Fixed;
-                }
-            }
-
-            Logger.Verbose("Concluding status as {0}.", status);
-
-            return status;
+            return investigation.Status ?? status;
         }
     }
 }
