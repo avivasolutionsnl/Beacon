@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/sm9eoe5qd48b44ay?svg=true)](https://ci.appveyor.com/project/dennisdoomen/beacon)
 # Beacon
 A TeamCity monitoring tool that uses a Delcom USB LED light to notify your teams
 
