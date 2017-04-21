@@ -23,6 +23,12 @@ namespace Beacon
         [Option("device", DefaultValue = "delcom", HelpText = "The device to use as the build light (e.g. console, delcom)")]
         public string Device { get; set; }
 
+        [Option("interval", DefaultValue = "10", HelpText = "The interval in seconds at which to check the status")]
+        public string IntervalInSeconds { get; set; }
+
+        [Option("timespan", DefaultValue = "7", HelpText = "The timespan in days to include builds from.")]
+        public string Timespan { get; set; }
+
         [Option('v', "verbose", HelpText = "Log verbose messages")]
         public bool Verbose { get; set; }
 

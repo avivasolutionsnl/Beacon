@@ -14,7 +14,7 @@ Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED
 
 To get started just run the following command-line:
 
-	beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc
+`beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc`
 
     </description> 
     <language>en-US</language>
