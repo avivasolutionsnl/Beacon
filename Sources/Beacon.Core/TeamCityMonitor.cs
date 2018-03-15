@@ -4,8 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.UI;
 
 using Beacon.Core.Models;
 
@@ -39,7 +37,7 @@ namespace Beacon.Core
 
             Console.CancelKeyPress += delegate { buildLight.NoStatus(); };
 
-            while (true)
+            do
             {
                 BuildStatus lastBuildStatus = await GetBuildStatus(buildTypeIds);
 
@@ -72,8 +70,12 @@ namespace Beacon.Core
                 }
 
                 Logger.Verbose($"Waiting for {config.Interval} seconds.");
-                await Task.Delay(config.Interval);
-            }
+
+                if (!config.RunOnce)
+                {
+                    await Task.Delay(config.Interval);
+                }
+            } while (!config.RunOnce);
         }
 
         private async Task<BuildStatus> GetBuildStatus(IEnumerable<string> buildTypeIds)
@@ -114,8 +116,7 @@ namespace Beacon.Core
 
             foreach (var buildTypeId in buildTypeIds)
             {
-                HttpResponseMessage result = await httpClient.GetAsync(
-                    $"httpAuth/app/rest/buildTypes/id:{buildTypeId}");
+                HttpResponseMessage result = await httpClient.GetAsync($"httpAuth/app/rest/buildTypes/id:{buildTypeId}");
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -142,8 +143,6 @@ namespace Beacon.Core
 
         private async Task<BuildStatus?> GetBuildTypeStatus(BuildType buildType)
         {
-            BuildStatus? status = null;
-
             if (buildType.IsPaused)
             {
                 Logger.Verbose("Bypassing because it is paused");
@@ -179,10 +178,8 @@ namespace Beacon.Core
             {
                 return BuildStatus.Passed;
             }
-            else
-            {
-                Logger.Verbose($"Build from branch {firstUnsuccesful.BranchName}(id: {firstUnsuccesful.Id}) failed");
-            }
+
+            Logger.Verbose($"Build from branch {firstUnsuccesful.BranchName}(id: {firstUnsuccesful.Id}) failed");
 
             if (buildType.IsUnstable)
             {
@@ -190,7 +187,7 @@ namespace Beacon.Core
                 return null;
             }
 
-            status = BuildStatus.Failed;
+            BuildStatus? status = BuildStatus.Failed;
 
             Logger.Verbose("Now checking investigation status.");
 

@@ -25,7 +25,8 @@ namespace Beacon
                     Password = options.Password,
                     Interval = TimeSpan.FromSeconds(int.Parse(options.IntervalInSeconds)),
                     TimeSpan = TimeSpan.FromDays(int.Parse(options.Timespan)),
-                    BuildTypeIds = string.Join(",", options.BuildTypeIds)
+                    BuildTypeIds = string.Join(",", options.BuildTypeIds),
+                    RunOnce = options.RunOnce
                 };
 
                 new TeamCityMonitor(config, buildLight).Start().Wait();

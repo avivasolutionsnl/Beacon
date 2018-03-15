@@ -18,5 +18,10 @@ namespace Beacon.Core
         /// The period of time to look back for builds while evaluating the state.
         /// </summary>
         public TimeSpan TimeSpan { get; set; }
+
+        /// <summary>
+        /// Check the build status only once.
+        /// </summary>
+        public bool RunOnce { get; set; }
     }
 }
