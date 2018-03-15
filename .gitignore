@@ -8,7 +8,6 @@
 *.sln.ide
 
 # Build results
-
 [Dd]ebug/
 [Rr]elease/
 x64/
@@ -59,6 +58,9 @@ ipch/
 *.psess
 *.vsp
 *.vspx
+
+#Visual Studio 2015 files
+**/.vs/
 
 # Guidance Automation Toolkit
 *.gpState
@@ -131,7 +133,6 @@ UpgradeLog*.htm
 # SQL Server files
 App_Data/*.mdf
 App_Data/*.ldf
-
 
 #LightSwitch generated files
 GeneratedArtifacts/
