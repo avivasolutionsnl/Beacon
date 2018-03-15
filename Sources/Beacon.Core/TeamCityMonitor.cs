@@ -113,10 +113,11 @@ namespace Beacon.Core
         private async Task<List<BuildStatus>> GetStatusOfAllBuilds(IEnumerable<string> buildTypeIds)
         {
             var statusPerBuild = new List<BuildStatus>();
+            var authPath = config.GuestAccess ? "guestAuth" : "httpAuth";
 
             foreach (var buildTypeId in buildTypeIds)
             {
-                HttpResponseMessage result = await httpClient.GetAsync($"httpAuth/app/rest/buildTypes/id:{buildTypeId}");
+                HttpResponseMessage result = await httpClient.GetAsync($"{authPath}/app/rest/buildTypes/id:{buildTypeId}");
 
                 if (result.IsSuccessStatusCode)
                 {

@@ -11,10 +11,11 @@ namespace Beacon
         [Option("url", Required = true, HelpText = "The root URL of the TeamCity server.")]
         public string Url { get; set; }
 
-        [Option("username", Required = true, HelpText = "The username of the account that has read access to TeamCity.")]
+        [Option("username", HelpText = "The username of the account that has read access to TeamCity. Username and guestaccess are mutually exclusive.", 
+            MutuallyExclusiveSet = "auth")]
         public string Username { get; set; }
 
-        [Option("password", Required = true, HelpText = "The password of the account that has read access to TeamCity.")]
+        [Option("password", HelpText = "The password of the account that has read access to TeamCity.")]
         public string Password { get; set; }
 
         [OptionArray("builds", Required = true, HelpText = "One or more builds identified by their TeamCity id (eg, bt64. bt12 or * for all).")]
@@ -34,6 +35,10 @@ namespace Beacon
 
         [Option('r', "runonce", HelpText = "Check the build status only once.")]
         public bool RunOnce { get; set; }
+
+        [Option('g', "guestaccess", HelpText = "Check the build status using the TeamCity guest account. Username and guestaccess are mutually exclusive.", 
+            MutuallyExclusiveSet = "auth")]
+        public bool GuestAccess { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }
