@@ -30,15 +30,15 @@ namespace Beacon
         [Option("timespan", DefaultValue = "7", HelpText = "The timespan in days to include builds from.")]
         public string Timespan { get; set; }
 
-        [Option('v', "verbose", HelpText = "Log verbose messages.")]
-        public bool Verbose { get; set; }
+        [Option('g', "guestaccess", HelpText = "Check the build status using the TeamCity guest account. Username and guestaccess are mutually exclusive.", 
+            MutuallyExclusiveSet = "auth")]
+        public bool GuestAccess { get; set; }
 
         [Option('r', "runonce", HelpText = "Check the build status only once.")]
         public bool RunOnce { get; set; }
 
-        [Option('g', "guestaccess", HelpText = "Check the build status using the TeamCity guest account. Username and guestaccess are mutually exclusive.", 
-            MutuallyExclusiveSet = "auth")]
-        public bool GuestAccess { get; set; }
+        [Option('v', "verbose", HelpText = "Log verbose messages.")]
+        public bool Verbose { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }

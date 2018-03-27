@@ -69,10 +69,9 @@ namespace Beacon.Core
                         break;
                 }
 
-                Logger.Verbose($"Waiting for {config.Interval} seconds.");
-
                 if (!config.RunOnce)
                 {
+                    Logger.Verbose($"Waiting for {config.Interval} seconds.");
                     await Task.Delay(config.Interval);
                 }
             } while (!config.RunOnce);
