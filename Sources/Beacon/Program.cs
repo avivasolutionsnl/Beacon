@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 using Beacon.Core;
 using Beacon.Lights;
@@ -11,8 +12,16 @@ namespace Beacon
         public static void Main(string[] args)
         {
             var options = new Options();
+            var parser = new Parser(with =>
+            {
 
-            if (Parser.Default.ParseArguments(args, options))
+                with.CaseSensitive = false;
+                with.HelpWriter = Console.Error;
+                with.MutuallyExclusive = true;
+                with.ParsingCulture = CultureInfo.InvariantCulture;
+            });
+
+            if (parser.ParseArguments(args, options))
             {
                 Logger.VerboseEnabled = options.Verbose;
 
@@ -26,7 +35,8 @@ namespace Beacon
                     Interval = TimeSpan.FromSeconds(int.Parse(options.IntervalInSeconds)),
                     TimeSpan = TimeSpan.FromDays(int.Parse(options.Timespan)),
                     BuildTypeIds = string.Join(",", options.BuildTypeIds),
-                    RunOnce = options.RunOnce
+                    RunOnce = options.RunOnce,
+                    GuestAccess = options.GuestAccess
                 };
 
                 new TeamCityMonitor(config, buildLight).Start().Wait();

@@ -23,5 +23,10 @@ namespace Beacon.Core
         /// Check the build status only once.
         /// </summary>
         public bool RunOnce { get; set; }
+
+        /// <summary>
+        /// Check the build status using the TeamCity guest account.
+        /// </summary>
+        public bool GuestAccess { get; set; }
     }
 }
