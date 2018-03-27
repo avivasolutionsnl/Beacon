@@ -26,11 +26,11 @@ TaskTearDown {
     TeamCity-ReportBuildProgress "Finished task $($psake.context.Peek().currentTaskName)"
 }
 
-task default -depends Clean, ExtractVersionsFromGit, RestoreNugetPackages, ApplyAssemblyVersioning, ApplyPackageVersioning, Compile, BuildZip, CreateChocoPackages
+task default -depends Clean, CreateChocoPackages
 
 task Clean -Description "Cleaning solution." {
-	Get-ChildItem $PackageDirectory *.nupkg | ForEach { Remove-Item $_.FullName }
-	Get-ChildItem $PackageDirectory *.zip | ForEach { Remove-Item $_.FullName }
+	Get-ChildItem $PackageDirectory *.nupkg | ForEach-Object { Remove-Item $_.FullName }
+	Get-ChildItem $PackageDirectory *.zip | ForEach-Object { Remove-Item $_.FullName }
 	
 	exec { msbuild /nologo /verbosity:minimal $SolutionFilePath /t:Clean /p:VSToolsPath="$SrcDir\Packages\MSBuild.Microsoft.VisualStudio.Web.targets.11.0.2.1\tools\VSToolsPath" }    
 }
@@ -50,17 +50,6 @@ task ExtractVersionsFromGit {
         else {
             Write-Output $json -join "`n";
         }
-}
-
-task RestoreNugetPackages {
-    $packageConfigs = Get-ChildItem $BaseDirectory -Recurse | where{$_.Name -eq "packages.config"}
-
-    foreach($packageConfig in $packageConfigs){
-    	Write-Host "Restoring" $packageConfig.FullName 
-    	exec { 
-            . "$NugetExe" install $packageConfig.FullName -OutputDirectory "$SrcDir\Packages" -ConfigFile "$SrcDir\.nuget\NuGet.Config"
-        }
-    }
 }
 
 task ApplyAssemblyVersioning -depends ExtractVersionsFromGit {
@@ -89,7 +78,7 @@ task ApplyAssemblyVersioning -depends ExtractVersionsFromGit {
 task ApplyPackageVersioning -depends ExtractVersionsFromGit {
     TeamCity-Block "Updating package version with build number $BuildNumber" {   
 	
-		$fullName = "$PackageDirectory\.nuspec"
+		$fullName = "$PackageDirectory\Beacon.nuspec"
 
 	    Set-ItemProperty -Path $fullName -Name IsReadOnly -Value $false
 		
@@ -99,15 +88,26 @@ task ApplyPackageVersioning -depends ExtractVersionsFromGit {
 	}
 }
 
-task Compile -Description "Compiling solution." { 
+task RestoreNugetPackages {
+    $packageConfigs = Get-ChildItem $BaseDirectory -Recurse | Where-Object { $_.Name -eq "packages.config" }
+
+    foreach($packageConfig in $packageConfigs) {
+    	Write-Host "Restoring" $packageConfig.FullName 
+    	exec { 
+            . "$NugetExe" install $packageConfig.FullName -OutputDirectory "$SrcDir\Packages" -ConfigFile "$SrcDir\.nuget\NuGet.Config"
+        }
+    }
+}
+
+task Compile -depends ApplyAssemblyVersioning, ApplyPackageVersioning, RestoreNugetPackages -Description "Compiling solution" { 
 	exec { msbuild /nologo /verbosity:minimal $SolutionFilePath /p:Configuration=Release /p:VSToolsPath="$SrcDir\Packages\MSBuild.Microsoft.VisualStudio.Web.targets.11.0.2.1\tools\VSToolsPath" }
 }
 
-task RunTests -depends Compile -Description "Running all unit tests." {
+task RunTests -depends Compile -Description "Running unit tests" {
 	$xunitRunner = "$SrcDir\packages\xunit.runners.1.9.2\tools\xunit.console.clr4.exe"
-	gci $SrcDir -Recurse -Include *Specs.csproj | % {
+	Get-ChildItem $SrcDir -Recurse -Include *Specs.csproj | ForEach-Object {
 		$project = $_.BaseName
-		if(!(Test-Path $ReportsDir\xUnit\$project)){
+		if(!(Test-Path $ReportsDir\xUnit\$project)) {
 			New-Item $ReportsDir\xUnit\$project -Type Directory
 		}
         
@@ -115,7 +115,13 @@ task RunTests -depends Compile -Description "Running all unit tests." {
 	}
 }
 
-task BuildZip {
+task CopyFiles -depends Compile {
+	@('LICENSE', 'README.md', 'VERIFICATION.txt') | Foreach-Object {
+        Copy-Item -Path "$BaseDirectory\$_" -Destination $BaseDirectory\Package\Output
+	}
+}
+
+task BuildZip -depends CopyFiles {
 	TeamCity-Block "Zipping up the binaries" {
 		$assembly = Get-ChildItem -Path $BaseDirectory\Package\Output -Filter Beacon.exe -Recurse | Select-Object -first 1
 				
@@ -125,18 +131,18 @@ task BuildZip {
 	}
 }
 
-task CreateChocoPackages -depends ApplyPackageVersioning, ApplyAssemblyVersioning -Description "Creating Chocolatey package." {
+task CreateChocoPackages -depends BuildZip -Description "Creating Chocolatey package" {
 	if (!$env:ChocolateyInstall) {
 		Write-Host "Installing Chocolatey"
-		iex ((new-object net.webclient).DownloadString('http://bit.ly/psChocInstall')) 
+		Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
   	}
 
 	exec { 
         $lastcd = $PWD;
-		cd $PackageDirectory
+		Set-Location $PackageDirectory
 		
-		choco pack .nuspec
+		choco pack Beacon.nuspec
 		
-		cd $lastcd;
+		Set-Location $lastcd;
     }
 }
