@@ -8,29 +8,32 @@ namespace Beacon
 {
     internal class Options
     {
-        [Option("url", Required = true, HelpText = "The root URL of the team city server.")]
+        [Option("url", Required = true, HelpText = "The root URL of the TeamCity server.")]
         public string Url { get; set; }
 
-        [Option("username", Required = true, HelpText = "The username of the account that has read access to TeamCity")]
+        [Option("username", Required = true, HelpText = "The username of the account that has read access to TeamCity.")]
         public string Username { get; set; }
 
-        [Option("password", Required = true, HelpText = "The password of the account that has read access to TeamCity")]
+        [Option("password", Required = true, HelpText = "The password of the account that has read access to TeamCity.")]
         public string Password { get; set; }
 
-        [OptionArray("builds", Required = true, HelpText = "One more builds identified by their id (eg, bt64. bt12 or * for all)")]
+        [OptionArray("builds", Required = true, HelpText = "One or more builds identified by their TeamCity id (eg, bt64. bt12 or * for all).")]
         public string[] BuildTypeIds { get; set; }
 
-        [Option("device", DefaultValue = "delcom", HelpText = "The device to use as the build light (e.g. console, delcom)")]
+        [Option("device", DefaultValue = "delcom", HelpText = "The device to use as the build light (e.g. console, delcom).")]
         public string Device { get; set; }
 
-        [Option("interval", DefaultValue = "10", HelpText = "The interval in seconds at which to check the status")]
+        [Option("interval", DefaultValue = "10", HelpText = "The interval in seconds at which to check the build status.")]
         public string IntervalInSeconds { get; set; }
 
         [Option("timespan", DefaultValue = "7", HelpText = "The timespan in days to include builds from.")]
         public string Timespan { get; set; }
 
-        [Option('v', "verbose", HelpText = "Log verbose messages")]
+        [Option('v', "verbose", HelpText = "Log verbose messages.")]
         public bool Verbose { get; set; }
+
+        [Option('r', "runonce", HelpText = "Check the build status only once.")]
+        public bool RunOnce { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }
@@ -40,8 +43,8 @@ namespace Beacon
         {
             var help = new HelpText
             {
-                Heading = new HeadingInfo("Beacon: Team City Monitor", Version),
-                Copyright = new CopyrightInfo("Dennis Doomen", 2015),
+                Heading = new HeadingInfo("Beacon: TeamCity Monitor", Version),
+                Copyright = new CopyrightInfo("Dennis Doomen", 2015, 2016, 2017, 2018),
                 AdditionalNewLineAfterOption = true,
                 AddDashesToOption = true
             };
@@ -67,9 +70,6 @@ namespace Beacon
             }
         }
 
-        private static string Version
-        {
-            get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
-        }
+        private static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
     }
 }
