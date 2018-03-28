@@ -1,46 +1,76 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Reflection;
 
 using Beacon.Core;
 using Beacon.Lights;
-
 using CommandLine;
+using CommandLine.Text;
 
 namespace Beacon
 {
+    [Flags]
+    internal enum ExitCodes
+    {
+        Success = 0,
+        Error = 1
+    }
+
     internal class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            var options = new Options();
             var parser = new Parser(with =>
             {
-                with.CaseSensitive = false;
-                with.HelpWriter = Console.Error;
-                with.MutuallyExclusive = true;
-                with.ParsingCulture = CultureInfo.InvariantCulture;
+                with.HelpWriter = null;
             });
 
-            if (parser.ParseArguments(args, options))
+            var result = parser.ParseArguments<Options>(args);
+            result.WithParsed(RunTeamCityMonitor).WithNotParsed(errors => HandleParseErrors(result, errors));
+
+            if (result.Tag.Equals(ParserResultType.NotParsed))
             {
-                Logger.VerboseEnabled = options.Verbose;
-
-                IBuildLight buildLight = new LightFactory().CreateLight(options.Device);
-
-                var config = new Config
-                {
-                    ServerUrl = options.Url,
-                    Username = options.Username,
-                    Password = options.Password,
-                    Interval = TimeSpan.FromSeconds(int.Parse(options.IntervalInSeconds)),
-                    TimeSpan = TimeSpan.FromDays(int.Parse(options.Timespan)),
-                    BuildTypeIds = string.Join(",", options.BuildTypeIds),
-                    RunOnce = options.RunOnce,
-                    GuestAccess = options.GuestAccess
-                };
-
-                new TeamCityMonitor(config, buildLight).Start().Wait();
+                return (int) ExitCodes.Error;
             }
+
+            return (int) ExitCodes.Success;
+        }
+
+        private static void RunTeamCityMonitor(Options options)
+        {
+            var buildLight = new LightFactory().CreateLight(options.Device);
+            var config = new Config
+            {
+                ServerUrl = options.Url,
+                Username = options.Username,
+                Password = options.Password,
+                Interval = TimeSpan.FromSeconds(options.IntervalInSeconds),
+                TimeSpan = TimeSpan.FromDays(options.Timespan),
+                BuildTypeIds = string.Join(",", options.BuildTypeIds),
+                RunOnce = options.RunOnce,
+                GuestAccess = options.GuestAccess
+            };
+
+            Logger.VerboseEnabled = options.Verbose;
+            new TeamCityMonitor(config, buildLight).Start().Wait();
+        }
+
+        private static void HandleParseErrors(ParserResult<Options> result, IEnumerable<Error> errors)
+        {
+            var helpText = new HelpText
+            {
+                AddDashesToOption = true,
+                AdditionalNewLineAfterOption = true,
+                Copyright = new CopyrightInfo("Dennis Doomen", 2015, 2018).ToString(),
+                Heading = new HeadingInfo("Beacon: TeamCity Monitor", Assembly.GetExecutingAssembly().GetName().Version.ToString())
+            };
+
+            helpText.AddOptions(result);
+
+            var newHelpText = HelpText.AutoBuild(result,
+                onError => HelpText.DefaultParsingErrorsHandler(result, helpText), example => example);
+
+            Console.Error.WriteLine(newHelpText);
         }
     }
 }
