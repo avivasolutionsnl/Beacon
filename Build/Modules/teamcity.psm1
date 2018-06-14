@@ -1,4 +1,4 @@
-﻿if ($env:TEAMCITY_VERSION) {
+if ($env:TEAMCITY_VERSION) {
 	# When PowerShell is started through TeamCity's Command Runner, the standard
 	# output will be wrapped at column 80 (a default). This has a negative impact
 	# on service messages, as TeamCity quite naturally fails parsing a wrapped
@@ -41,7 +41,7 @@ function TeamCity-TestError([string]$name, [string]$output) {
 	TeamCity-WriteServiceMessage 'testStdErr' @{ name=$name; out=$output }
 }
 
-function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='', [string] $screenshotfile='', [string]$type='', [string]$expected='', [string]$actual='') {
+function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='', [string]$type='', [string]$expected='', [string]$actual='') {
 	$messageAttributes = @{ name=$name; message=$message; details=$details }
 
 	if (![string]::IsNullOrEmpty($type)) {
@@ -51,15 +51,8 @@ function TeamCity-TestFailed([string]$name, [string]$message, [string]$details='
 	if (![string]::IsNullOrEmpty($expected)) {
 		$messageAttributes.expected=$expected
 	}
-
 	if (![string]::IsNullOrEmpty($actual)) {
 		$messageAttributes.actual=$actual
-	}
-
-	if (![string]::IsNullOrEmpty($screenshotfile)) {
-		$messageAttributes.screenshotfile=$screenshotfile
-	
-		TeamCity-PublishArtifact $screenshotfile
 	}
 
 	TeamCity-WriteServiceMessage 'testFailed' $messageAttributes
@@ -103,11 +96,7 @@ function TeamCity-ReportBuildFinish([string]$message) {
 	TeamCity-WriteServiceMessage 'progressFinish' $message
 }
 
-function TeamCity-ReportWarning([string]$text="") {
-	TeamCity-WriteServiceMessage "message" #@{ status='WARNING'; text=$text; }
-}
-
-function TeamCity-ReportBuildStatus([string]$status, [string]$text="") {
+function TeamCity-ReportBuildStatus([string]$status, [string]$text='') {
 	TeamCity-WriteServiceMessage 'buildStatus' @{ status=$status; text=$text }
 }
 

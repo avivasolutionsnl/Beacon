@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+
 using CommandLine;
 using CommandLine.Text;
 
@@ -11,14 +12,17 @@ namespace Beacon
         [Option("url", Required = true, HelpText = "The root URL of the TeamCity server.")]
         public string Url { get; set; }
 
-        [Option("username", HelpText = "The username of the account that has read access to TeamCity. Username and guestaccess are mutually exclusive.", 
+        [Option("username",
+            HelpText =
+                "The username of the account that has read access to TeamCity. Username and guestaccess are mutually exclusive.",
             MutuallyExclusiveSet = "auth")]
         public string Username { get; set; }
 
         [Option("password", HelpText = "The password of the account that has read access to TeamCity.")]
         public string Password { get; set; }
 
-        [OptionArray("builds", Required = true, HelpText = "One or more builds identified by their TeamCity id (eg, bt64. bt12 or * for all).")]
+        [OptionArray("builds", Required = true,
+            HelpText = "One or more builds identified by their TeamCity id (eg, bt64. bt12 or * for all).")]
         public string[] BuildTypeIds { get; set; }
 
         [Option("device", DefaultValue = "delcom", HelpText = "The device to use as the build light (e.g. console, delcom).")]
@@ -30,7 +34,9 @@ namespace Beacon
         [Option("timespan", DefaultValue = "7", HelpText = "The timespan in days to include builds from.")]
         public string Timespan { get; set; }
 
-        [Option('g', "guestaccess", HelpText = "Check the build status using the TeamCity guest account. Username and guestaccess are mutually exclusive.", 
+        [Option('g', "guestaccess",
+            HelpText =
+                "Check the build status using the TeamCity guest account. Username and guestaccess are mutually exclusive.",
             MutuallyExclusiveSet = "auth")]
         public bool GuestAccess { get; set; }
 
