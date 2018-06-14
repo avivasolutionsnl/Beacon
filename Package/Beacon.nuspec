@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?> 
-<package> 
-  <metadata> 
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
     <id>beacon</id>
     <title>Beacon</title>
     <version>0.2.0-unstable0006</version>
     <owners>Dennis Doomen</owners>
     <authors>Dennis Doomen</authors>
     <summary>
-		Monitors TeamCity builds and uses that to control a Delcom USB LED light
+		Monitors TeamCity builds and uses that to control a Delcom USB LED light.
     </summary>
     <description>
 Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) to a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
@@ -16,12 +16,19 @@ To get started just run the following command-line:
 
 `beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc`
 
-    </description> 
+or, alternatively using TeamCity guest access and running only once with verbose logging:
+
+`beacon --url=http://yourteamcity.com --guestaccess --runonce --verbose --builds=build_id_1 build_id_2 etc`
+
+    </description>
     <language>en-US</language>
-    <licenseUrl>https://github.com/dennisdoomen/beacon/blob/develop/LICENSE</licenseUrl>    
+    <licenseUrl>https://github.com/dennisdoomen/beacon/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/dennisdoomen/beacon</projectUrl>
+    <bugTrackerUrl>https://github.com/dennisdoomen/Beacon/issues</bugTrackerUrl>
+    <packageSourceUrl>https://github.com/dennisdoomen/beacon</packageSourceUrl>
+    <projectSourceUrl>https://github.com/dennisdoomen/beacon</projectSourceUrl>
     <tags>teamcity build-monitoring delcom ci continuous integration</tags>
-    <copyright>Copyright Dennis Doomen 2015</copyright>
+    <copyright>Copyright Dennis Doomen 2015-2018</copyright>
     <releaseNotes>
 This first version is still a bit rudimentary, but keep an eye on the project site to see some of the things being worked on.
     </releaseNotes>
