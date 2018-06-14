@@ -28,7 +28,22 @@ TaskTearDown {
 
 task default -depends Clean, CreateChocoPackages
 
-task Clean -Description "Cleaning solution." {
+task DetermineMsBuildPath -depends RestoreNugetPackages {
+	Write-Host "Adding msbuild to the environment path"
+
+	$installationPath = & "$BaseDirectory\Sources\Packages\vswhere.2.4.1\tools\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+
+	if ($installationPath) {
+		$msbuildPath = join-path $installationPath 'MSBuild\15.0\Bin'
+
+		if (test-path $msbuildPath) {
+                        Write-Host "msbuild directory set to $msbuildPath"
+			$env:path = "$msbuildPath;$env:path"
+		}
+	}
+}
+
+task Clean -depends DetermineMsBuildPath -Description "Cleaning solution." {
 	Get-ChildItem $PackageDirectory *.nupkg | ForEach-Object { Remove-Item $_.FullName }
 	Get-ChildItem $PackageDirectory *.zip | ForEach-Object { Remove-Item $_.FullName }
 	
@@ -99,7 +114,7 @@ task RestoreNugetPackages {
     }
 }
 
-task Compile -depends ApplyAssemblyVersioning, ApplyPackageVersioning, RestoreNugetPackages -Description "Compiling solution" { 
+task Compile -depends DetermineMsBuildPath, ApplyAssemblyVersioning, ApplyPackageVersioning, RestoreNugetPackages -Description "Compiling solution" { 
 	exec { msbuild /nologo /verbosity:minimal $SolutionFilePath /p:Configuration=Release /p:VSToolsPath="$SrcDir\Packages\MSBuild.Microsoft.VisualStudio.Web.targets.11.0.2.1\tools\VSToolsPath" }
 }
 

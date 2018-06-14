@@ -3,6 +3,7 @@ using System.Globalization;
 
 using Beacon.Core;
 using Beacon.Lights;
+
 using CommandLine;
 
 namespace Beacon
@@ -14,7 +15,6 @@ namespace Beacon
             var options = new Options();
             var parser = new Parser(with =>
             {
-
                 with.CaseSensitive = false;
                 with.HelpWriter = Console.Error;
                 with.MutuallyExclusive = true;
