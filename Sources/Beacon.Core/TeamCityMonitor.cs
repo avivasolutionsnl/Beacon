@@ -179,7 +179,7 @@ namespace Beacon.Core
                 return BuildStatus.Passed;
             }
 
-            Logger.Verbose($"Build from branch {firstUnsuccesful.BranchName}(id: {firstUnsuccesful.Id}) failed");
+            Logger.Verbose($"Build from branch {firstUnsuccesful.BranchName} (id: {firstUnsuccesful.Id}) failed");
 
             if (buildType.IsUnstable)
             {
