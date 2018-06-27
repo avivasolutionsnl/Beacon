@@ -10,7 +10,7 @@ namespace Beacon.Core.Models
             return new Build
             {
                 Id = long.Parse(element.Attribute("id").Value),
-                BranchName = element.Attribute("branchName").Value,
+                BranchName = element.Attribute("branchName")?.Value ?? "<no branch; build has no VCS root>",
                 IsRunning = !element.Attribute("state").Value.Equals("finished", StringComparison.InvariantCultureIgnoreCase),
                 IsSuccessful = element.Attribute("status").Value.Equals("success", StringComparison.CurrentCultureIgnoreCase)
             };
