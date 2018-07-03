@@ -130,7 +130,7 @@ namespace Beacon.Core
                         statusPerBuild.Add(status.Value);
                     }
 
-                    Logger.Verbose($"Status of Built Type '{buildType.Id}' is {status ?? BuildStatus.Unavailable}.");
+                    Logger.WriteLine($"Status of build type '{buildType.Id}' is {status ?? BuildStatus.Unavailable}.");
                 }
                 else
                 {
