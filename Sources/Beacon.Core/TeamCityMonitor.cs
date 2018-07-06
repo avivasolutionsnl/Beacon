@@ -11,6 +11,7 @@ namespace Beacon.Core
 {
     public class TeamCityMonitor
     {
+        private readonly string authPath;
         private readonly Config config;
         private readonly IBuildLight buildLight;
         private readonly HttpClient httpClient;
@@ -19,6 +20,7 @@ namespace Beacon.Core
         {
             this.config = config;
             this.buildLight = buildLight;
+            authPath = config.GuestAccess ? "guestAuth" : "httpAuth";
             httpClient = new HttpClient(new HttpClientHandler
             {
                 Credentials = new NetworkCredential(config.Username, config.Password)
@@ -112,7 +114,6 @@ namespace Beacon.Core
         private async Task<List<BuildStatus>> GetStatusOfAllBuilds(IEnumerable<string> buildTypeIds)
         {
             var statusPerBuild = new List<BuildStatus>();
-            var authPath = config.GuestAccess ? "guestAuth" : "httpAuth";
 
             foreach (var buildTypeId in buildTypeIds)
             {
@@ -153,7 +154,7 @@ namespace Beacon.Core
             string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
             
             string buildsXml = await httpClient.GetStringAsync(
-                    $"httpAuth/app/rest/buildTypes/id:{buildType.Id}/builds?locator=branch:default:any,running:false,sinceDate:{fromDateInTcFormat}");
+                    $"{authPath}/app/rest/buildTypes/id:{buildType.Id}/builds?locator=branch:default:any,running:false,sinceDate:{fromDateInTcFormat}");
 
             var builds = BuildCollection.FromXml(buildsXml);
             if (builds.IsEmpty)
@@ -192,7 +193,7 @@ namespace Beacon.Core
             Logger.Verbose("Now checking investigation status.");
 
             string investigationsXml =
-                await httpClient.GetStringAsync($"/httpAuth/app/rest/investigations?locator=buildType:(id:{buildType.Id})");
+                await httpClient.GetStringAsync($"/{authPath}/app/rest/investigations?locator=buildType:(id:{buildType.Id})");
 
             var investigation = Investigation.FromXml(investigationsXml);
 
