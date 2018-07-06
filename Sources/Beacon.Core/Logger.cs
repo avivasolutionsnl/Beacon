@@ -4,6 +4,22 @@ namespace Beacon.Core
 {
     public class Logger
     {
+        public static void WriteErrorLine(string message, params object[] parameters)
+        {
+            var foregroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            WriteLine(message, parameters);
+            Console.ForegroundColor = foregroundColor;
+        }
+
+        public static void WriteWarningLine(string message, params object[] parameters)
+        {
+            var foregroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            WriteLine(message, parameters);
+            Console.ForegroundColor = foregroundColor;
+        }
+
         public static void WriteLine(string message, params object[] parameters)
         {
             var messageToLog = string.Format(message, parameters);

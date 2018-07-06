@@ -33,7 +33,7 @@ namespace Beacon.Core
         {
             var buildTypeIds = config.BuildTypeIds == "*"
                 ? new string[0]
-                : config.BuildTypeIds.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToArray();
+                : config.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
 
             buildLight.NoStatus();
 
@@ -131,7 +131,19 @@ namespace Beacon.Core
                         statusPerBuild.Add(status.Value);
                     }
 
-                    Logger.WriteLine($"Status of build type '{buildType.Id}' is {status ?? BuildStatus.Unavailable}.");
+                    var statusMessage = $"Status of build type '{buildType.Id}' is {status ?? BuildStatus.Unavailable}.";
+                    switch (status)
+                    {
+                        case BuildStatus.Failed:
+                            Logger.WriteErrorLine(statusMessage);
+                            break;
+                        case BuildStatus.Investigating:
+                            Logger.WriteWarningLine(statusMessage);
+                            break;
+                        default:
+                            Logger.WriteLine(statusMessage);
+                            break;
+                    }
                 }
                 else
                 {
@@ -152,7 +164,7 @@ namespace Beacon.Core
 
             var fromDate = DateTimeOffset.Now.Subtract(config.TimeSpan);
             string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
-            
+
             string buildsXml = await httpClient.GetStringAsync(
                     $"{authPath}/app/rest/buildTypes/id:{buildType.Id}/builds?locator=branch:default:any,running:false,sinceDate:{fromDateInTcFormat}");
 
