@@ -6,7 +6,7 @@ namespace Beacon.Core
     {
         public static void WriteLine(string message, params object[] parameters)
         {
-            var messageToLog = String.Format(message, parameters);
+            var messageToLog = string.Format(message, parameters);
             Console.WriteLine("{0} {1}", DateTime.Now.ToShortTimeString(), messageToLog);
         }
 
@@ -14,8 +14,8 @@ namespace Beacon.Core
         {
             if (VerboseEnabled)
             {
-                Console.WriteLine("VERBOSE: {0} {1}", DateTime.Now.ToShortTimeString(),
-                    String.Format(message, parameters));
+                var messageToLog = string.Format(message, parameters);
+                Console.WriteLine("VERBOSE: {0} {1}", DateTime.Now.ToShortTimeString(), messageToLog);
             }
         }
 

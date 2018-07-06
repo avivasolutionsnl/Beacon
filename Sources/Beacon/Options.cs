@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 
 using CommandLine;
 using CommandLine.Text;
@@ -12,75 +10,78 @@ namespace Beacon
         [Option("url", Required = true, HelpText = "The root URL of the TeamCity server.")]
         public string Url { get; set; }
 
-        [Option("username",
-            HelpText =
-                "The username of the account that has read access to TeamCity. Username and guestaccess are mutually exclusive.",
-            MutuallyExclusiveSet = "auth")]
+        [Option("username", Required = true,
+            HelpText = 
+                "The username of the account that has read access to TeamCity. Options username/password and guestaccess are mutually exclusive.", 
+            SetName = "auth")]
         public string Username { get; set; }
 
-        [Option("password", HelpText = "The password of the account that has read access to TeamCity.")]
+        [Option("password", Required = true,
+            HelpText = "The password of the account that has read access to TeamCity.", SetName = "auth")]
         public string Password { get; set; }
 
-        [OptionArray("builds", Required = true,
-            HelpText = "One or more builds identified by their TeamCity id (eg, bt64. bt12 or * for all).")]
-        public string[] BuildTypeIds { get; set; }
+        [Option("builds", Required = true, 
+            HelpText = "One or more builds identified by their TeamCity id (eg, bt64 bt12 or * for all).")]
+        public IEnumerable<string> BuildTypeIds { get; set; }
 
-        [Option("device", DefaultValue = "delcom", HelpText = "The device to use as the build light (e.g. console, delcom).")]
+        [Option("device", Default = "delcom", 
+            HelpText = "The device to use as the build light (e.g. console, delcom).")]
         public string Device { get; set; }
 
-        [Option("interval", DefaultValue = "10", HelpText = "The interval in seconds at which to check the build status.")]
-        public string IntervalInSeconds { get; set; }
+        [Option("interval", Default = 10, 
+            HelpText = "The interval in seconds at which to check the build status.")]
+        public int IntervalInSeconds { get; set; }
 
-        [Option("timespan", DefaultValue = "7", HelpText = "The timespan in days to include builds from.")]
-        public string Timespan { get; set; }
+        [Option("timespan", Default = 7, HelpText = "The timespan in days to include builds from.")]
+        public int Timespan { get; set; }
 
-        [Option('g', "guestaccess",
-            HelpText =
-                "Check the build status using the TeamCity guest account. Username and guestaccess are mutually exclusive.",
-            MutuallyExclusiveSet = "auth")]
+        [Option('g', "guestaccess", Required = true,
+            HelpText = 
+                "Check the build status using the TeamCity guest account. Options guestaccess and username/password are mutually exclusive.", 
+            SetName = "guest")]
         public bool GuestAccess { get; set; }
 
-        [Option('r', "runonce", HelpText = "Check the build status only once.")]
+        [Option('r', "runonce", Default = false, HelpText = "Check the build status only once.")]
         public bool RunOnce { get; set; }
 
         [Option('v', "verbose", HelpText = "Log verbose messages.")]
         public bool Verbose { get; set; }
 
-        [ParserState]
-        public IParserState LastParserState { get; set; }
-
-        [HelpOption]
-        public string GetUsage()
+        [Usage(ApplicationAlias = "Beacon.exe")]
+        public static IEnumerable<Example> Examples
         {
-            var help = new HelpText
+            get
             {
-                Heading = new HeadingInfo("Beacon: TeamCity Monitor", Version),
-                Copyright = new CopyrightInfo("Dennis Doomen", 2015, 2016, 2017, 2018),
-                AdditionalNewLineAfterOption = true,
-                AddDashesToOption = true
-            };
-
-            AddErrors(help);
-
-            help.AddOptions(this);
-
-            return help;
-        }
-
-        private void AddErrors(HelpText help)
-        {
-            if (LastParserState.Errors.Any())
-            {
-                var errors = help.RenderParsingErrorsText(this, 2); // indent with two spaces
-
-                if (!string.IsNullOrEmpty(errors))
+                var unParserSettings = new UnParserSettings
                 {
-                    help.AddPreOptionsLine(string.Concat(Environment.NewLine, "ERROR(S):"));
-                    help.AddPreOptionsLine(errors);
-                }
+                    GroupSwitches = true
+                };
+
+                yield return new Example("Using TeamCity credentials", unParserSettings, new Options
+                {
+                    BuildTypeIds = new[] { "SomeBuildId", "SomeOtherBuildId" },
+                    Password = "pass",
+                    Url = "http://teamcity.local",
+                    Username = "user"
+                });
+
+                yield return new Example("Using TeamCity guest access and running only once before exiting", unParserSettings, new Options
+                {
+                    BuildTypeIds = new[] { "SomeBuildId", "SomeOtherBuildId" },
+                    GuestAccess = true,
+                    RunOnce = true,
+                    Url = "http://teamcity.local"
+                });
+
+                yield return new Example("Using TeamCity guest access, running only once before exiting and verbose logging", unParserSettings, new Options
+                {
+                    BuildTypeIds = new[] { "SomeBuildId", "SomeOtherBuildId" },
+                    GuestAccess = true,
+                    RunOnce = true,
+                    Url = "http://teamcity.local",
+                    Verbose = true
+                });
             }
         }
-
-        private static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
     }
 }
