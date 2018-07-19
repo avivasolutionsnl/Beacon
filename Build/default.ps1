@@ -58,7 +58,7 @@ task ExtractVersionsFromGit {
           
             TeamCity-SetBuildNumber $version.FullSemVer;
             
-            $script:AssemblyVersion = $version.ClassicVersion;
+            $script:AssemblyVersion = $version.AssemblySemVer;
             $script:InformationalVersion = $version.InformationalVersion;
             $script:NuGetVersion = $version.NuGetVersionV2;
         }
