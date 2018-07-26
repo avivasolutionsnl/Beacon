@@ -35,6 +35,12 @@ namespace Beacon
         [Option("timespan", Default = 7, HelpText = "The timespan in days to include builds from.")]
         public int Timespan { get; set; }
 
+        [Option('a', "all", Default = false, HelpText = "Monitor builds for all branches, not just active branches.")]
+        public bool IncludeAllBranches { get; set; }
+        
+        [Option('f', "failed", Default = false, HelpText = "Monitor builds that failed to start as well, not just finished builds.")]
+        public bool IncludeFailedToStart { get; set; }
+
         [Option('g', "guestaccess", Required = true,
             HelpText = 
                 "Check the build status using the TeamCity guest account. Options guestaccess and username/password are mutually exclusive.", 
