@@ -30,8 +30,7 @@ namespace Beacon.Core
         {
             if (VerboseEnabled)
             {
-                var messageToLog = string.Format(message, parameters);
-                Console.WriteLine("VERBOSE: {0} {1}", DateTime.Now.ToShortTimeString(), messageToLog);
+                WriteLine(message, parameters);
             }
         }
 
