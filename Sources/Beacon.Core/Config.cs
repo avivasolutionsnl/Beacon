@@ -28,5 +28,9 @@ namespace Beacon.Core
         /// Check the build status using the TeamCity guest account.
         /// </summary>
         public bool GuestAccess { get; set; }
+
+        public bool IncludeAllBranches { get; set; }
+
+        public bool IncludeFailedToStart { get; set; }
     }
 }

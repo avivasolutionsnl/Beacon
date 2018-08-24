@@ -21,12 +21,17 @@ namespace Beacon.Core
             this.config = config;
             this.buildLight = buildLight;
             authPath = config.GuestAccess ? "guestAuth" : "httpAuth";
-            httpClient = new HttpClient(new HttpClientHandler
+
+            var httpClientHandler = new HttpClientHandler
             {
                 Credentials = new NetworkCredential(config.Username, config.Password)
-            });
+            };
 
-            httpClient.BaseAddress = new Uri(config.ServerUrl);
+            httpClient = new HttpClient(httpClientHandler)
+            {
+                BaseAddress = new Uri(config.ServerUrl)
+            };
+
         }
 
         public async Task Start()
@@ -162,11 +167,16 @@ namespace Beacon.Core
                 return null;
             }
 
-            var fromDate = DateTimeOffset.Now.Subtract(config.TimeSpan);
-            string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
+            string branchLocator = config.IncludeAllBranches
+                ? "branch:default:any"
+                : "branch:(default:any,policy:active_history_and_active_vcs_branches)";
 
+            string failedToStartLocator = config.IncludeFailedToStart ? "failedToStart:any" : "failedToStart:false";
+            DateTimeOffset fromDate = DateTimeOffset.Now.Subtract(config.TimeSpan);
+            string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
+            string locator = $"{branchLocator},{failedToStartLocator},running:false,sinceDate:{fromDateInTcFormat}";
             string buildsXml = await httpClient.GetStringAsync(
-                    $"{authPath}/app/rest/buildTypes/id:{buildType.Id}/builds?locator=branch:default:any,running:false,sinceDate:{fromDateInTcFormat}");
+                $"{authPath}/app/rest/buildTypes/id:{buildType.Id}/builds?locator={locator}");
 
             var builds = BuildCollection.FromXml(buildsXml);
             if (builds.IsEmpty)

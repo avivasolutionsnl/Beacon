@@ -48,7 +48,9 @@ namespace Beacon
                 TimeSpan = TimeSpan.FromDays(options.Timespan),
                 BuildTypeIds = string.Join(",", options.BuildTypeIds),
                 RunOnce = options.RunOnce,
-                GuestAccess = options.GuestAccess
+                GuestAccess = options.GuestAccess,
+                IncludeAllBranches = options.IncludeAllBranches,
+                IncludeFailedToStart = options.IncludeFailedToStart
             };
 
             Logger.VerboseEnabled = options.Verbose;
