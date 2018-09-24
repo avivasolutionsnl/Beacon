@@ -40,8 +40,6 @@ namespace Beacon.Core
                 ? new string[0]
                 : config.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
 
-            buildLight.NoStatus();
-
             Console.CancelKeyPress += delegate { buildLight.NoStatus(); };
 
             do
@@ -196,13 +194,13 @@ namespace Beacon.Core
                 }
             }
 
-            Build firstUnsuccesful = dictionary.Values.FirstOrDefault(v => !v.IsSuccessful);
-            if (firstUnsuccesful == null)
+            Build firstFailingBuild = dictionary.Values.FirstOrDefault(v => !v.IsSuccessful);
+            if (firstFailingBuild == null)
             {
                 return BuildStatus.Passed;
             }
 
-            Logger.Verbose($"Build from branch {firstUnsuccesful.BranchName} (id: {firstUnsuccesful.Id}) failed");
+            Logger.Verbose($"Build from branch {firstFailingBuild.BranchName} (id: {firstFailingBuild.Id}) failed");
 
             if (buildType.IsUnstable)
             {

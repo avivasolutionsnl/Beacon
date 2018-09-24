@@ -6,18 +6,16 @@ namespace Beacon.Core
     {
         public static void WriteErrorLine(string message, params object[] parameters)
         {
-            var foregroundColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
             WriteLine(message, parameters);
-            Console.ForegroundColor = foregroundColor;
+            Console.ResetColor();
         }
 
         public static void WriteWarningLine(string message, params object[] parameters)
         {
-            var foregroundColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Yellow;
             WriteLine(message, parameters);
-            Console.ForegroundColor = foregroundColor;
+            Console.ResetColor();
         }
 
         public static void WriteLine(string message, params object[] parameters)
@@ -36,7 +34,7 @@ namespace Beacon.Core
 
         public static void Error(Exception exception)
         {
-            WriteLine(exception.ToString());
+            WriteErrorLine(exception.ToString());
         }
 
         public static bool VerboseEnabled { get; set; }
