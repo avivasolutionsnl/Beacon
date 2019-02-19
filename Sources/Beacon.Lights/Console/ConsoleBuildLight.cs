@@ -6,6 +6,9 @@ namespace Beacon.Lights.Console
 {
     internal class ConsoleBuildLight : IBuildLight
     {
+        public void Initialize() {}
+        public void Dispose() {}
+        
         public void Success()
         {
             System.Console.ForegroundColor = ConsoleColor.Green;

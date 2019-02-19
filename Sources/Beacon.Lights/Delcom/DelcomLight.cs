@@ -6,6 +6,9 @@ namespace Beacon.Lights.Delcom
     {
         private readonly DelcomLed delcomLed = new DelcomLed();
 
+        public void Initialize() {}
+        public void Dispose() {}
+
         public void Success()
         {
             VerboseThemeChange("GREEN");
