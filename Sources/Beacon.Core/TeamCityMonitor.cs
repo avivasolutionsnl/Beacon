@@ -188,6 +188,9 @@ namespace Beacon.Core
             {
                 string branch = build.BranchName;
 
+                if (config.OnlyDefaultBranch && !build.DefaultBranch)
+                    continue;
+                
                 if (!dictionary.ContainsKey(branch) || dictionary[branch].Id < build.Id)
                 {
                     dictionary[branch] = build;

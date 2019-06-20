@@ -52,6 +52,9 @@ namespace Beacon
 
         [Option('v', "verbose", HelpText = "Log verbose messages.")]
         public bool Verbose { get; set; }
+        
+        [Option('d', "defaultbranch", Default = false, HelpText = "Only monitor the status of the default branch")]
+        public bool OnlyDefaultBranch { get; set; }
 
         [Usage(ApplicationAlias = "Beacon.exe")]
         public static IEnumerable<Example> Examples
