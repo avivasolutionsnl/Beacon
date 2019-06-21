@@ -32,5 +32,10 @@ namespace Beacon.Core
         public bool IncludeAllBranches { get; set; }
 
         public bool IncludeFailedToStart { get; set; }
+        
+        /// <summary>
+        /// Only check the build status on the default branch.
+        /// </summary>
+        public bool OnlyDefaultBranch { get; set; }
     }
 }

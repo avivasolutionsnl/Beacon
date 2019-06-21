@@ -50,7 +50,8 @@ namespace Beacon
                 RunOnce = options.RunOnce,
                 GuestAccess = options.GuestAccess,
                 IncludeAllBranches = options.IncludeAllBranches,
-                IncludeFailedToStart = options.IncludeFailedToStart
+                IncludeFailedToStart = options.IncludeFailedToStart,
+                OnlyDefaultBranch = options.OnlyDefaultBranch,
             };
 
             Logger.VerboseEnabled = options.Verbose;
