@@ -25,8 +25,11 @@ namespace Beacon
                 with.HelpWriter = null;
             });
 
-            var result = parser.ParseArguments<Options>(args);
-            result.WithParsed(RunTeamCityMonitor).WithNotParsed(errors => HandleParseErrors(result, errors));
+            var result = parser.ParseArguments<AzureDevopsOptions, TeamcityOptions>(args);
+            
+            result.WithParsed<TeamcityOptions>(RunTeamCityMonitor)
+                .WithParsed<AzureDevopsOptions>(RunAzureDevopsMonitor)
+                .WithNotParsed(errors => HandleParseErrors(result, errors));
 
             if (result.Tag.Equals(ParserResultType.NotParsed))
             {
@@ -36,10 +39,10 @@ namespace Beacon
             return (int) ExitCodes.Success;
         }
 
-        private static void RunTeamCityMonitor(Options options)
+        private static void RunTeamCityMonitor(TeamcityOptions options)
         {
             var buildLight = new LightFactory().CreateLight(options.Device);
-            var config = new Config
+            var config = new TeamcityConfig
             {
                 ServerUrl = options.Url,
                 Username = options.Username,
@@ -58,13 +61,31 @@ namespace Beacon
             new TeamCityMonitor(config, buildLight).Start().Wait();
         }
 
-        private static void HandleParseErrors(ParserResult<Options> result, IEnumerable<Error> errors)
+        private static void RunAzureDevopsMonitor(AzureDevopsOptions options)
+        {
+            var buildLight = new LightFactory().CreateLight(options.Device);
+            var config = new AzureDevopsConfig()
+            {
+                Url = new Uri(options.Url),
+                BranchName = options.BranchName,
+                DefinitionId = options.DefinitionId,
+                Interval = TimeSpan.FromSeconds(options.IntervalInSeconds),
+                ProjectName = options.ProjectName,
+                PersonalAccessToken = options.PersonalAccessToken,
+                RunOnce = options.RunOnce
+            };
+            
+            Logger.VerboseEnabled = options.Verbose;
+            new AzureDevopsMonitor(config, buildLight).Start().Wait();
+        }
+        
+        private static void HandleParseErrors(ParserResult<object> result, IEnumerable<Error> errors)
         {
             var helpText = new HelpText
             {
                 AddDashesToOption = true,
                 AdditionalNewLineAfterOption = true,
-                Copyright = new CopyrightInfo("Dennis Doomen", 2015, 2018).ToString(),
+                Copyright = new CopyrightInfo("Dennis Doomen", 2015, 2020).ToString(),
                 Heading = new HeadingInfo("Beacon: TeamCity Monitor", Assembly.GetExecutingAssembly().GetName().Version.ToString())
             };
 

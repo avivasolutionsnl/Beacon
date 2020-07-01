@@ -12,33 +12,33 @@ namespace Beacon.Core
     public class TeamCityMonitor
     {
         private readonly string authPath;
-        private readonly Config config;
+        private readonly TeamcityConfig teamcityConfig;
         private readonly IBuildLight buildLight;
         private readonly HttpClient httpClient;
 
-        public TeamCityMonitor(Config config, IBuildLight buildLight)
+        public TeamCityMonitor(TeamcityConfig teamcityConfig, IBuildLight buildLight)
         {
-            this.config = config;
+            this.teamcityConfig = teamcityConfig;
             this.buildLight = buildLight;
-            authPath = config.GuestAccess ? "guestAuth" : "httpAuth";
+            authPath = teamcityConfig.GuestAccess ? "guestAuth" : "httpAuth";
 
             var httpClientHandler = new HttpClientHandler
             {
-                Credentials = new NetworkCredential(config.Username, config.Password)
+                Credentials = new NetworkCredential(teamcityConfig.Username, teamcityConfig.Password)
             };
 
             httpClient = new HttpClient(httpClientHandler)
             {
-                BaseAddress = new Uri(config.ServerUrl)
+                BaseAddress = new Uri(teamcityConfig.ServerUrl)
             };
 
         }
 
         public async Task Start()
         {
-            var buildTypeIds = config.BuildTypeIds == "*"
+            var buildTypeIds = teamcityConfig.BuildTypeIds == "*"
                 ? new string[0]
-                : config.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+                : teamcityConfig.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
 
             Console.CancelKeyPress += delegate { buildLight.NoStatus(); };
 
@@ -74,12 +74,12 @@ namespace Beacon.Core
                         break;
                 }
 
-                if (!config.RunOnce)
+                if (!teamcityConfig.RunOnce)
                 {
-                    Logger.Verbose($"Waiting for {config.Interval} seconds.");
-                    await Task.Delay(config.Interval);
+                    Logger.Verbose($"Waiting for {teamcityConfig.Interval} seconds.");
+                    await Task.Delay(teamcityConfig.Interval);
                 }
-            } while (!config.RunOnce);
+            } while (!teamcityConfig.RunOnce);
         }
 
         private async Task<BuildStatus> GetBuildStatus(IEnumerable<string> buildTypeIds)
@@ -126,7 +126,7 @@ namespace Beacon.Core
                 {
                     var buildType = BuildType.FromXml(await result.Content.ReadAsStringAsync());
 
-                    Logger.Verbose($"Analyzing the builds for '{buildType.Id}' over a period of {config.TimeSpan.Days} days.");
+                    Logger.Verbose($"Analyzing the builds for '{buildType.Id}' over a period of {teamcityConfig.TimeSpan.Days} days.");
 
                     BuildStatus? status = await GetBuildTypeStatus(buildType);
                     if (status.HasValue)
@@ -165,12 +165,12 @@ namespace Beacon.Core
                 return null;
             }
 
-            string branchLocator = config.IncludeAllBranches
+            string branchLocator = teamcityConfig.IncludeAllBranches
                 ? "branch:default:any"
                 : "branch:(default:any,policy:active_history_and_active_vcs_branches)";
 
-            string failedToStartLocator = config.IncludeFailedToStart ? "failedToStart:any" : "failedToStart:false";
-            DateTimeOffset fromDate = DateTimeOffset.Now.Subtract(config.TimeSpan);
+            string failedToStartLocator = teamcityConfig.IncludeFailedToStart ? "failedToStart:any" : "failedToStart:false";
+            DateTimeOffset fromDate = DateTimeOffset.Now.Subtract(teamcityConfig.TimeSpan);
             string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
             string locator = $"{branchLocator},{failedToStartLocator},running:false,sinceDate:{fromDateInTcFormat}";
             string buildsXml = await httpClient.GetStringAsync(
@@ -188,7 +188,7 @@ namespace Beacon.Core
             {
                 string branch = build.BranchName;
 
-                if (config.OnlyDefaultBranch && !build.DefaultBranch)
+                if (teamcityConfig.OnlyDefaultBranch && !build.DefaultBranch)
                     continue;
                 
                 if (!dictionary.ContainsKey(branch) || dictionary[branch].Id < build.Id)
