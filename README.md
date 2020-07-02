@@ -3,15 +3,9 @@
 
 # Beacon
 
-A TeamCity monitoring tool that uses a Delcom USB LED light to notify your teams
+A monitoring tool for Azure Devops and Teamcity that uses a Delcom USB LED light to notify your teams.
 
 ![Chocolate](./Images/Screenshot.png)
-
-## Backlog
-
-* Support for configuring the RGB values, flash mode and power level of the LED.
-* Support for including all TeamCity projects under a certain project node, including more advanced filtering rules.
-* Deployment as a Windows Service.
 
 ## How to install
 
@@ -22,14 +16,29 @@ The easiest deployment mechanism is to install [Chocolatey](https://chocolatey.o
 Then run `beacon` and observe the command-line arguments.
 
 ## Example usage
+### Azure Devops
+Using a public Azure Devops project and running continuously:
 
+    beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1
+
+Or, using a personal access token (e.g. 1234567890ab, see [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page) for how to obtain a token) "for a private project and a custom branch name "branch/my":
+
+    beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1 --token 1234567890ab -b -b refs/heads/branch/my
+
+### TeamCity
 Using a named TeamCity account and running continuously:
 
-    beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc
+    beacon teamcity --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc
 
 Or, alternatively using TeamCity guest access, running only once and with verbose logging:
 
-    beacon --url=http://yourteamcity.com --guestaccess --runonce --verbose --builds=build_id_1 build_id_2 etc
+    beacon teamcity --url=http://yourteamcity.com --guestaccess --runonce --verbose --builds=build_id_1 build_id_2 etc
+
+## Backlog
+
+* Support for configuring the RGB values, flash mode and power level of the LED.
+* Support for including all TeamCity projects under a certain project node, including more advanced filtering rules.
+* Deployment as a Windows Service.
 
 ## Why another
 
