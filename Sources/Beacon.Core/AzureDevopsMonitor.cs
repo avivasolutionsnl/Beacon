@@ -38,7 +38,7 @@ namespace Beacon.Core
                     var build = (await buildClient.GetBuildsAsync(config.ProjectName, definitions, top: 1,
                         branchName: config.BranchName)).FirstOrDefault();
 
-                    if (build.Status == Microsoft.TeamFoundation.Build.WebApi.BuildStatus.Completed)
+                    if (build != null && build.Status == Microsoft.TeamFoundation.Build.WebApi.BuildStatus.Completed)
                     {
                         switch (build.Result)
                         {
@@ -68,11 +68,9 @@ namespace Beacon.Core
                                 break;
                         }
                     }
-
-                    if (!config.RunOnce)
+                    else
                     {
-                        Logger.Verbose($"Waiting for {config.Interval} seconds.");
-                        await Task.Delay(config.Interval);
+                        Logger.WriteErrorLine("Did not receive build info");
                     }
                 }
                 catch (Exception e)
@@ -80,6 +78,11 @@ namespace Beacon.Core
                     Logger.Error(e);
                 }
                 
+                if (!config.RunOnce)
+                {
+                    Logger.Verbose($"Waiting for {config.Interval} seconds.");
+                    await Task.Delay(config.Interval);
+                }
             }
             while (!config.RunOnce);
         }
