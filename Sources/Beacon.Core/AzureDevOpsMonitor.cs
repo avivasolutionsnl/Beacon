@@ -8,13 +8,13 @@ using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Beacon.Core
 {
-    public class AzureDevopsMonitor
+    public class AzureDevOpsMonitor
     {
         private readonly IBuildLight light;
-        private readonly AzureDevopsConfig config;
+        private readonly AzureDevOpsConfig config;
         private readonly BuildHttpClient buildClient;
 
-        public AzureDevopsMonitor(AzureDevopsConfig config, IBuildLight light)
+        public AzureDevOpsMonitor(AzureDevOpsConfig config, IBuildLight light)
         {
             this.config = config;
             this.light = light;

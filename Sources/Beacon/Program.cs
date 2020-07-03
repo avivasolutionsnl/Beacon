@@ -25,10 +25,10 @@ namespace Beacon
                 with.HelpWriter = null;
             });
 
-            var result = parser.ParseArguments<AzureDevopsOptions, TeamcityOptions>(args);
+            var result = parser.ParseArguments<AzureDevOpsOptions, TeamcityOptions>(args);
             
             result.WithParsed<TeamcityOptions>(RunTeamCityMonitor)
-                .WithParsed<AzureDevopsOptions>(RunAzureDevopsMonitor)
+                .WithParsed<AzureDevOpsOptions>(RunAzureDevopsMonitor)
                 .WithNotParsed(errors => HandleParseErrors(result, errors));
 
             if (result.Tag.Equals(ParserResultType.NotParsed))
@@ -61,10 +61,10 @@ namespace Beacon
             new TeamCityMonitor(config, buildLight).Start().Wait();
         }
 
-        private static void RunAzureDevopsMonitor(AzureDevopsOptions options)
+        private static void RunAzureDevopsMonitor(AzureDevOpsOptions options)
         {
             var buildLight = new LightFactory().CreateLight(options.Device);
-            var config = new AzureDevopsConfig()
+            var config = new AzureDevOpsConfig()
             {
                 Url = new Uri(options.Url),
                 BranchName = options.BranchName,
@@ -76,7 +76,7 @@ namespace Beacon
             };
             
             Logger.VerboseEnabled = options.Verbose;
-            new AzureDevopsMonitor(config, buildLight).Start().Wait();
+            new AzureDevOpsMonitor(config, buildLight).Start().Wait();
         }
         
         private static void HandleParseErrors(ParserResult<object> result, IEnumerable<Error> errors)

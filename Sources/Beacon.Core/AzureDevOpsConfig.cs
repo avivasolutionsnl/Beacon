@@ -2,7 +2,7 @@
 
 namespace Beacon.Core
 {
-    public class AzureDevopsConfig : Config
+    public class AzureDevOpsConfig : Config
     {
         public Uri Url { get; set; }
         

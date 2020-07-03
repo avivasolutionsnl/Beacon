@@ -75,7 +75,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AzureDevopsOptions.cs" />
+    <Compile Include="AzureDevOpsOptions.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="TeamcityOptions.cs" />
     <Compile Include="Program.cs" />

@@ -3,7 +3,7 @@
 namespace Beacon
 {
     [Verb("azuredevops", HelpText = "Use Azure Devops as build server")]
-    internal class AzureDevopsOptions : Options
+    internal class AzureDevOpsOptions : Options
     {
         [Option("url", Required = true, HelpText = "Azure Devops URL")]
         public string Url { get; set; }

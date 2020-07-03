@@ -176,8 +176,8 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AzureDevopsConfig.cs" />
-    <Compile Include="AzureDevopsMonitor.cs" />
+    <Compile Include="AzureDevOpsConfig.cs" />
+    <Compile Include="AzureDevOpsMonitor.cs" />
     <Compile Include="BuildStatus.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="TeamcityConfig.cs" />
