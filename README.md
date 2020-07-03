@@ -23,7 +23,7 @@ Using a public Azure Devops project and running continuously:
 
 Or, using a personal access token (e.g. 1234567890ab, see [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page) for how to obtain a token) "for a private project and a custom branch name "branch/my":
 
-    beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1 --token 1234567890ab -b -b refs/heads/branch/my
+    beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1 --token 1234567890ab -b refs/heads/branch/my
 
 ### TeamCity
 Using a named TeamCity account and running continuously:
