@@ -3,22 +3,30 @@
   <metadata>
     <id>beacon</id>
     <title>Beacon</title>
-    <version>1.2.3</version>
-    <owners>Dennis Doomen</owners>
-    <authors>Dennis Doomen</authors>
+    <version>1.3.1</version>
+    <owners>Aviva Solutions</owners>
+    <authors>Aviva Solutions</authors>
     <summary>
-		Monitors TeamCity builds and uses that to control a Delcom USB LED light.
+		Monitors Azure DevOps and TeamCity builds and uses that to control a Delcom USB LED light.
     </summary>
     <description>
-Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) to a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
+Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) to a Azure Devops build pipeline or a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
 
-To get started just run the following command-line:
+To get started just run the following command-line, for Azure DevOps:
 
-`beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc`
+    `beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1`
+
+or, using a personal access token or a private project and a custom branch name "branch/my":
+
+    `beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1 --token 1234567890ab -b refs/heads/branch/my`
+
+or for TeamCity:
+
+    `beacon --url=http://yourteamcity.com --username=username --password=password --builds=build_id_1 build_id_2 etc`
 
 or, alternatively using TeamCity guest access and running only once with verbose logging:
 
-`beacon --url=http://yourteamcity.com --guestaccess --runonce --verbose --builds=build_id_1 build_id_2 etc`
+    `beacon --url=http://yourteamcity.com --guestaccess --runonce --verbose --builds=build_id_1 build_id_2 etc`
 
     </description>
     <language>en-US</language>
@@ -27,10 +35,10 @@ or, alternatively using TeamCity guest access and running only once with verbose
     <bugTrackerUrl>https://github.com/dennisdoomen/Beacon/issues</bugTrackerUrl>
     <packageSourceUrl>https://github.com/dennisdoomen/beacon</packageSourceUrl>
     <projectSourceUrl>https://github.com/dennisdoomen/beacon</projectSourceUrl>
-    <tags>teamcity build-monitoring delcom ci continuous integration</tags>
-    <copyright>Copyright Dennis Doomen 2015-2018</copyright>
+    <tags>azure devops teamcity build-monitoring delcom ci continuous integration</tags>
+    <copyright>Copyright Aviva Solutions 2015-2020</copyright>
     <releaseNotes>
-This first version is still a bit rudimentary, but keep an eye on the project site to see some of the things being worked on.
+Added Azure DevOps support.
     </releaseNotes>
   </metadata>
   <files>

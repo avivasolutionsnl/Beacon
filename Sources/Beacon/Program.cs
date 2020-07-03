@@ -85,7 +85,7 @@ namespace Beacon
             {
                 AddDashesToOption = true,
                 AdditionalNewLineAfterOption = true,
-                Copyright = new CopyrightInfo("Dennis Doomen", 2015, 2020).ToString(),
+                Copyright = new CopyrightInfo("Aviva Solutions", 2015, 2020).ToString(),
                 Heading = new HeadingInfo("Beacon: TeamCity Monitor", Assembly.GetExecutingAssembly().GetName().Version.ToString())
             };
 

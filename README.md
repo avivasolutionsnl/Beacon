@@ -3,7 +3,7 @@
 
 # Beacon
 
-A monitoring tool for Azure Devops and Teamcity that uses a Delcom USB LED light to notify your teams.
+A monitoring tool for Azure DevOps and Teamcity that uses a Delcom USB LED light to notify your teams.
 
 ![Chocolate](./Images/Screenshot.png)
 
