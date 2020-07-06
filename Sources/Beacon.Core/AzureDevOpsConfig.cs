@@ -8,10 +8,6 @@ namespace Beacon.Core
         
         public string ProjectName { get; set; }
         
-        public int DefinitionId { get; set; }
-        
-        public string BranchName { get; set; }
-        
         public string PersonalAccessToken { get; set; }
     }
 }

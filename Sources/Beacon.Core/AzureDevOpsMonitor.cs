@@ -1,72 +1,65 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Threading.Tasks;
 
 using Microsoft.TeamFoundation.Build.WebApi;
+using Microsoft.TeamFoundation.Common;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Beacon.Core
 {
-    public class AzureDevOpsMonitor
+    public class AzureDevOpsMonitor : BuildMonitor
     {
-        private readonly IBuildLight light;
-        private readonly AzureDevOpsConfig config;
+        private readonly AzureDevOpsConfig azureDevOpsConfig;
         private readonly BuildHttpClient buildClient;
+        private IEnumerable<int> buildIds;
 
-        public AzureDevOpsMonitor(AzureDevOpsConfig config, IBuildLight light)
+        public AzureDevOpsMonitor(AzureDevOpsConfig config, IBuildLight light) : base(light, config)
         {
-            this.config = config;
-            this.light = light;
+            this.azureDevOpsConfig = config;
             
             var credentials = config.PersonalAccessToken == null ? new VssCredentials() : new VssBasicCredential(string.Empty, config.PersonalAccessToken);
             VssConnection connection = new VssConnection(config.Url, credentials);
 
             buildClient = connection.GetClient<BuildHttpClient>();
+            
+            buildIds = config.BuildTypeIds == "*"
+                ? new int[0]
+                : config.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(id => Int32.Parse(id)).ToArray();
         }
 
-        public async Task Start()
+        protected override async Task<BuildStatus> GetBuildStatus()
         {
-            Console.CancelKeyPress += delegate { light.NoStatus(); };
-            
-            var definitions = new[] { (await buildClient.GetDefinitionAsync(config.ProjectName, config.DefinitionId)).Id };
+            // Select all build definitions
+            if (buildIds.IsNullOrEmpty())
+            {
+                var definitions = await buildClient.GetDefinitionsAsync(azureDevOpsConfig.ProjectName);
+                buildIds = definitions.Select(d => d.Id);
+            }
 
-            do
+            var statuses = await GetBuildStatuses();
+
+            return CombineStatuses(statuses);
+        }
+
+        private async Task<List<BuildStatus>> GetBuildStatuses()
+        {
+            var statusPerBuild = new List<BuildStatus>();
+
+            foreach (var buildId in buildIds)
             {
                 try
                 {
-                    var build = (await buildClient.GetBuildsAsync(config.ProjectName, definitions, top: 1,
-                        branchName: config.BranchName)).FirstOrDefault();
+                    var build = (await buildClient.GetBuildsAsync(azureDevOpsConfig.ProjectName, new[] { buildId },
+                        top: 1)).FirstOrDefault();
 
-                    if (build != null && build.Status == Microsoft.TeamFoundation.Build.WebApi.BuildStatus.Completed)
+                    if (build != null && build.Status == Microsoft.TeamFoundation.Build.WebApi.BuildStatus.Completed && build.Result != null)
                     {
-                        switch (build.Result)
-                        {
-                            case BuildResult.Succeeded:
-                                light.Success();
-                                Logger.WriteLine("Passed");
-                                break;
-
-                            case BuildResult.PartiallySucceeded:
-                                light.Investigate();
-                                Logger.WriteLine("Investigating");
-                                break;
-
-                            case BuildResult.Failed:
-                                light.Fail();
-                                Logger.WriteLine("Failed");
-                                break;
-
-                            case BuildResult.Canceled:
-                                light.Investigate();
-                                Logger.WriteLine("Cancelled");
-                                break;
-
-                            default:
-                                light.NoStatus();
-                                Logger.WriteLine("Build status not available");
-                                break;
-                        }
+                        statusPerBuild.Add(BuildResultToStatus(build.Result.Value));
                     }
                     else
                     {
@@ -77,14 +70,30 @@ namespace Beacon.Core
                 {
                     Logger.Error(e);
                 }
-                
-                if (!config.RunOnce)
-                {
-                    Logger.Verbose($"Waiting for {config.Interval} seconds.");
-                    await Task.Delay(config.Interval);
-                }
             }
-            while (!config.RunOnce);
+            
+            return statusPerBuild;
+        }
+
+        private Beacon.Core.BuildStatus BuildResultToStatus(BuildResult result)
+        {
+            switch (result)
+            {
+                case BuildResult.Succeeded:
+                    return BuildStatus.Passed;
+
+                case BuildResult.PartiallySucceeded:
+                    return BuildStatus.Investigating;
+
+                case BuildResult.Failed:
+                    return BuildStatus.Failed;
+
+                case BuildResult.Canceled:
+                    return BuildStatus.Investigating;
+                
+                default:
+                    return BuildStatus.Unavailable;
+            }
         }
     }
 }

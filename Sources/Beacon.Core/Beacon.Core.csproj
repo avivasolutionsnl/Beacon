@@ -178,6 +178,7 @@
     </Compile>
     <Compile Include="AzureDevOpsConfig.cs" />
     <Compile Include="AzureDevOpsMonitor.cs" />
+    <Compile Include="BuildMonitor.cs" />
     <Compile Include="BuildStatus.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="TeamcityConfig.cs" />

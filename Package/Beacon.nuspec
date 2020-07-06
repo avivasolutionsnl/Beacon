@@ -12,13 +12,13 @@
     <description>
 Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) to a Azure Devops build pipeline or a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
 
-To get started just run the following command-line, for Azure DevOps:
+To get started just run the following command-line, for Azure DevOps and running continuously for definition id (ie. build) #1:
 
-    `beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1`
+    `beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --builds=1`
 
-or, using a personal access token or a private project and a custom branch name "branch/my":
+or, using a personal access token or a private project and for all definitions:
 
-    `beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --definitionid 1 --token 1234567890ab -b refs/heads/branch/my`
+    `beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --builds=* --token 1234567890ab`
 
 or for TeamCity:
 

@@ -13,5 +13,7 @@ namespace Beacon.Core
         /// The interval at which to check the status of all builds.
         /// </summary>
         public TimeSpan Interval { get; set; }
+        
+        public string BuildTypeIds { get; set; }
     }
 }

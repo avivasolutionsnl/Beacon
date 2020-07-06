@@ -11,12 +11,6 @@ namespace Beacon
         [Option("project", Required = true, HelpText = "Azure Devops project name")]
         public string ProjectName { get; set; }
 
-        [Option("definitionid", Required = true, HelpText = "Azure Devops definition id")]
-        public int DefinitionId { get; set; }
-
-        [Option('b', "branch", Default="refs/heads/master", HelpText = "Branch name")]
-        public string BranchName { get; set; }
-
         [Option("token", HelpText = "Azure Devops personal access token, required for private projects")]
         public string PersonalAccessToken { get; set; }
     }

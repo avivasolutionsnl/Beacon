@@ -21,10 +21,6 @@ namespace Beacon
             HelpText = "The password of the account that has read access to TeamCity.", SetName = "auth")]
         public string Password { get; set; }
 
-        [Option("builds", Required = true, 
-            HelpText = "One or more builds identified by their TeamCity id (eg, bt64 bt12 or * for all).")]
-        public IEnumerable<string> BuildTypeIds { get; set; }
-
         [Option("timespan", Default = 7, HelpText = "The timespan in days to include builds from.")]
         public int Timespan { get; set; }
 

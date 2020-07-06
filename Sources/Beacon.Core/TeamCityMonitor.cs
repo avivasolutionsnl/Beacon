@@ -9,17 +9,16 @@ using Beacon.Core.Models;
 
 namespace Beacon.Core
 {
-    public class TeamCityMonitor
+    public class TeamCityMonitor : BuildMonitor
     {
         private readonly string authPath;
         private readonly TeamcityConfig teamcityConfig;
-        private readonly IBuildLight buildLight;
         private readonly HttpClient httpClient;
+        private readonly IEnumerable<string> buildTypeIds;
 
-        public TeamCityMonitor(TeamcityConfig teamcityConfig, IBuildLight buildLight)
+        public TeamCityMonitor(TeamcityConfig teamcityConfig, IBuildLight buildLight) : base(buildLight, teamcityConfig)
         {
             this.teamcityConfig = teamcityConfig;
-            this.buildLight = buildLight;
             authPath = teamcityConfig.GuestAccess ? "guestAuth" : "httpAuth";
 
             var httpClientHandler = new HttpClientHandler
@@ -31,90 +30,29 @@ namespace Beacon.Core
             {
                 BaseAddress = new Uri(teamcityConfig.ServerUrl)
             };
-
-        }
-
-        public async Task Start()
-        {
-            var buildTypeIds = teamcityConfig.BuildTypeIds == "*"
+            
+            buildTypeIds = config.BuildTypeIds == "*"
                 ? new string[0]
-                : teamcityConfig.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-
-            Console.CancelKeyPress += delegate { buildLight.NoStatus(); };
-
-            do
-            {
-                BuildStatus lastBuildStatus = await GetBuildStatus(buildTypeIds);
-
-                switch (lastBuildStatus)
-                {
-                    case BuildStatus.Unavailable:
-                        buildLight.NoStatus();
-                        Logger.WriteLine("Build status not available");
-                        break;
-
-                    case BuildStatus.Passed:
-                        buildLight.Success();
-                        Logger.WriteLine("Passed");
-                        break;
-
-                    case BuildStatus.Investigating:
-                        buildLight.Investigate();
-                        Logger.WriteLine("Investigating");
-                        break;
-
-                    case BuildStatus.Failed:
-                        buildLight.Fail();
-                        Logger.WriteLine("Failed");
-                        break;
-
-                    case BuildStatus.Fixed:
-                        buildLight.Fixed();
-                        Logger.WriteLine("Fixed");
-                        break;
-                }
-
-                if (!teamcityConfig.RunOnce)
-                {
-                    Logger.Verbose($"Waiting for {teamcityConfig.Interval} seconds.");
-                    await Task.Delay(teamcityConfig.Interval);
-                }
-            } while (!teamcityConfig.RunOnce);
+                : config.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
         }
 
-        private async Task<BuildStatus> GetBuildStatus(IEnumerable<string> buildTypeIds)
+        protected override async Task<BuildStatus> GetBuildStatus()
         {
-            BuildStatus status = BuildStatus.Unavailable;
-
             try
             {
-                List<BuildStatus> results = await GetStatusOfAllBuilds(buildTypeIds.ToArray());
-                if (!results.Any())
-                {
-                    status = BuildStatus.Unavailable;
-                }
-                else if (results.Any(result => result == BuildStatus.Failed))
-                {
-                    status = BuildStatus.Failed;
-                }
-                else if (results.Any(result => result == BuildStatus.Investigating))
-                {
-                    status = BuildStatus.Investigating;
-                }
-                else
-                {
-                    status = BuildStatus.Passed;
-                }
+                List<BuildStatus> results = await GetStatusOfAllBuilds();
+
+                return CombineStatuses(results);
             }
             catch (Exception exception)
             {
                 Logger.Error(exception);
             }
 
-            return status;
+            return BuildStatus.Unavailable;
         }
 
-        private async Task<List<BuildStatus>> GetStatusOfAllBuilds(IEnumerable<string> buildTypeIds)
+        private async Task<List<BuildStatus>> GetStatusOfAllBuilds()
         {
             var statusPerBuild = new List<BuildStatus>();
 

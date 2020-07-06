@@ -67,8 +67,7 @@ namespace Beacon
             var config = new AzureDevOpsConfig()
             {
                 Url = new Uri(options.Url),
-                BranchName = options.BranchName,
-                DefinitionId = options.DefinitionId,
+                BuildTypeIds = string.Join(",", options.BuildTypeIds),
                 Interval = TimeSpan.FromSeconds(options.IntervalInSeconds),
                 ProjectName = options.ProjectName,
                 PersonalAccessToken = options.PersonalAccessToken,

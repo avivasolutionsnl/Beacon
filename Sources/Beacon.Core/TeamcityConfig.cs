@@ -7,7 +7,6 @@ namespace Beacon.Core
         public string ServerUrl { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string BuildTypeIds { get; set; }
 
         /// <summary>
         /// The period of time to look back for builds while evaluating the state.

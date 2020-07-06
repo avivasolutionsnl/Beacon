@@ -1,4 +1,6 @@
-﻿using CommandLine;
+﻿using System.Collections.Generic;
+
+using CommandLine;
 
 namespace Beacon
 {
@@ -14,6 +16,10 @@ namespace Beacon
         [Option("interval", Default = 10, 
             HelpText = "The interval in seconds at which to check the build status.")]
         public int IntervalInSeconds { get; set; }
+        
+        [Option("builds", Required = true, 
+            HelpText = "One or more builds identified by their TeamCity id (eg, bt64 bt12 or * for all), or Azure Devops definition id (eg 1, 2, (* is not supported))")]
+        public IEnumerable<string> BuildTypeIds { get; set; }
         
         [Option('v', "verbose", HelpText = "Log verbose messages.")]
         public bool Verbose { get; set; }
