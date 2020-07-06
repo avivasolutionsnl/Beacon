@@ -63,7 +63,7 @@ namespace Beacon.Core
                     }
                     else
                     {
-                        Logger.WriteErrorLine("Did not receive build info");
+                        Logger.WriteErrorLine($"Did not receive build info for definition id: {buildId}");
                     }
                 }
                 catch (Exception e)
