@@ -9,112 +9,50 @@ using Beacon.Core.Models;
 
 namespace Beacon.Core
 {
-    public class TeamCityMonitor
+    public class TeamCityMonitor : BuildMonitor
     {
         private readonly string authPath;
-        private readonly Config config;
-        private readonly IBuildLight buildLight;
+        private readonly TeamcityConfig teamcityConfig;
         private readonly HttpClient httpClient;
+        private readonly IEnumerable<string> buildTypeIds;
 
-        public TeamCityMonitor(Config config, IBuildLight buildLight)
+        public TeamCityMonitor(TeamcityConfig teamcityConfig, IBuildLight buildLight) : base(buildLight, teamcityConfig)
         {
-            this.config = config;
-            this.buildLight = buildLight;
-            authPath = config.GuestAccess ? "guestAuth" : "httpAuth";
+            this.teamcityConfig = teamcityConfig;
+            authPath = teamcityConfig.GuestAccess ? "guestAuth" : "httpAuth";
 
             var httpClientHandler = new HttpClientHandler
             {
-                Credentials = new NetworkCredential(config.Username, config.Password)
+                Credentials = new NetworkCredential(teamcityConfig.Username, teamcityConfig.Password)
             };
 
             httpClient = new HttpClient(httpClientHandler)
             {
-                BaseAddress = new Uri(config.ServerUrl)
+                BaseAddress = new Uri(teamcityConfig.ServerUrl)
             };
-
-        }
-
-        public async Task Start()
-        {
-            var buildTypeIds = config.BuildTypeIds == "*"
+            
+            buildTypeIds = config.BuildTypeIds == "*"
                 ? new string[0]
                 : config.BuildTypeIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-
-            Console.CancelKeyPress += delegate { buildLight.NoStatus(); };
-
-            do
-            {
-                BuildStatus lastBuildStatus = await GetBuildStatus(buildTypeIds);
-
-                switch (lastBuildStatus)
-                {
-                    case BuildStatus.Unavailable:
-                        buildLight.NoStatus();
-                        Logger.WriteLine("Build status not available");
-                        break;
-
-                    case BuildStatus.Passed:
-                        buildLight.Success();
-                        Logger.WriteLine("Passed");
-                        break;
-
-                    case BuildStatus.Investigating:
-                        buildLight.Investigate();
-                        Logger.WriteLine("Investigating");
-                        break;
-
-                    case BuildStatus.Failed:
-                        buildLight.Fail();
-                        Logger.WriteLine("Failed");
-                        break;
-
-                    case BuildStatus.Fixed:
-                        buildLight.Fixed();
-                        Logger.WriteLine("Fixed");
-                        break;
-                }
-
-                if (!config.RunOnce)
-                {
-                    Logger.Verbose($"Waiting for {config.Interval} seconds.");
-                    await Task.Delay(config.Interval);
-                }
-            } while (!config.RunOnce);
         }
 
-        private async Task<BuildStatus> GetBuildStatus(IEnumerable<string> buildTypeIds)
+        protected override async Task<BuildStatus> GetBuildStatus()
         {
-            BuildStatus status = BuildStatus.Unavailable;
-
             try
             {
-                List<BuildStatus> results = await GetStatusOfAllBuilds(buildTypeIds.ToArray());
-                if (!results.Any())
-                {
-                    status = BuildStatus.Unavailable;
-                }
-                else if (results.Any(result => result == BuildStatus.Failed))
-                {
-                    status = BuildStatus.Failed;
-                }
-                else if (results.Any(result => result == BuildStatus.Investigating))
-                {
-                    status = BuildStatus.Investigating;
-                }
-                else
-                {
-                    status = BuildStatus.Passed;
-                }
+                List<BuildStatus> results = await GetStatusOfAllBuilds();
+
+                return CombineStatuses(results);
             }
             catch (Exception exception)
             {
                 Logger.Error(exception);
             }
 
-            return status;
+            return BuildStatus.Unavailable;
         }
 
-        private async Task<List<BuildStatus>> GetStatusOfAllBuilds(IEnumerable<string> buildTypeIds)
+        private async Task<List<BuildStatus>> GetStatusOfAllBuilds()
         {
             var statusPerBuild = new List<BuildStatus>();
 
@@ -126,7 +64,7 @@ namespace Beacon.Core
                 {
                     var buildType = BuildType.FromXml(await result.Content.ReadAsStringAsync());
 
-                    Logger.Verbose($"Analyzing the builds for '{buildType.Id}' over a period of {config.TimeSpan.Days} days.");
+                    Logger.Verbose($"Analyzing the builds for '{buildType.Id}' over a period of {teamcityConfig.TimeSpan.Days} days.");
 
                     BuildStatus? status = await GetBuildTypeStatus(buildType);
                     if (status.HasValue)
@@ -165,12 +103,12 @@ namespace Beacon.Core
                 return null;
             }
 
-            string branchLocator = config.IncludeAllBranches
+            string branchLocator = teamcityConfig.IncludeAllBranches
                 ? "branch:default:any"
                 : "branch:(default:any,policy:active_history_and_active_vcs_branches)";
 
-            string failedToStartLocator = config.IncludeFailedToStart ? "failedToStart:any" : "failedToStart:false";
-            DateTimeOffset fromDate = DateTimeOffset.Now.Subtract(config.TimeSpan);
+            string failedToStartLocator = teamcityConfig.IncludeFailedToStart ? "failedToStart:any" : "failedToStart:false";
+            DateTimeOffset fromDate = DateTimeOffset.Now.Subtract(teamcityConfig.TimeSpan);
             string fromDateInTcFormat = Uri.EscapeDataString(fromDate.ToString("yyyyMMdd'T'HHmmssK").Replace(":", ""));
             string locator = $"{branchLocator},{failedToStartLocator},running:false,sinceDate:{fromDateInTcFormat}";
             string buildsXml = await httpClient.GetStringAsync(
@@ -188,7 +126,7 @@ namespace Beacon.Core
             {
                 string branch = build.BranchName;
 
-                if (config.OnlyDefaultBranch && !build.DefaultBranch)
+                if (teamcityConfig.OnlyDefaultBranch && !build.DefaultBranch)
                     continue;
                 
                 if (!dictionary.ContainsKey(branch) || dictionary[branch].Id < build.Id)
