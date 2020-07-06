@@ -4,6 +4,8 @@ using System.Reflection;
 
 using Beacon.Core;
 using Beacon.Lights;
+using Beacon.Lights.Shelly;
+
 using CommandLine;
 using CommandLine.Text;
 
@@ -42,6 +44,10 @@ namespace Beacon
         private static void RunTeamCityMonitor(TeamcityOptions options)
         {
             var buildLight = new LightFactory().CreateLight(options.Device);
+            if (buildLight is ShellyLight)
+            {
+                (buildLight as ShellyLight).Configure(options.ShellyUrl);
+            }
             var config = new TeamcityConfig
             {
                 ServerUrl = options.Url,
@@ -64,6 +70,10 @@ namespace Beacon
         private static void RunAzureDevopsMonitor(AzureDevOpsOptions options)
         {
             var buildLight = new LightFactory().CreateLight(options.Device);
+            if (buildLight is ShellyLight)
+            {
+                (buildLight as ShellyLight).Configure(options.ShellyUrl);
+            }
             var config = new AzureDevOpsConfig()
             {
                 Url = new Uri(options.Url),

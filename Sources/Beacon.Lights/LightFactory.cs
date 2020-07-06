@@ -5,6 +5,7 @@ using System.Linq;
 using Beacon.Core;
 using Beacon.Lights.Console;
 using Beacon.Lights.Delcom;
+using Beacon.Lights.Shelly;
 
 namespace Beacon.Lights
 {
@@ -16,6 +17,7 @@ namespace Beacon.Lights
         {
             devices.Add("console", new ConsoleBuildLight());
             devices.Add("delcom", new DelcomLight());
+            devices.Add("shelly", new ShellyLight());
         }
 
         public string[] SupportedDevices

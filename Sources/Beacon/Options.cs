@@ -7,8 +7,11 @@ namespace Beacon
     internal class Options
     {
         [Option("device", Default = "delcom", 
-            HelpText = "The device to use as the build light (e.g. console, delcom).")]
+            HelpText = "The device to use as the build light (e.g. console, delcom, shelly).")]
         public string Device { get; set; }
+        
+        [Option("shellyurl", HelpText = "The base URL of the Shelly Bulb")]
+        public string ShellyUrl { get; set; }
         
         [Option('r', "runonce", Default = false, HelpText = "Check the build status only once.")]
         public bool RunOnce { get; set; }
