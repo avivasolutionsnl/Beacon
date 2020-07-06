@@ -18,7 +18,7 @@ namespace Beacon
         public int IntervalInSeconds { get; set; }
         
         [Option("builds", Required = true, 
-            HelpText = "One or more builds identified by their TeamCity id (eg, bt64 bt12 or * for all), or Azure Devops definition id (eg 1, 2, (* is not supported))")]
+            HelpText = "One or more builds identified by their TeamCity id (eg, bt64 bt12 or * for all), or Azure Devops definition id (eg 1, 2, * for all))")]
         public IEnumerable<string> BuildTypeIds { get; set; }
         
         [Option('v', "verbose", HelpText = "Log verbose messages.")]

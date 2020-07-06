@@ -17,9 +17,9 @@ Then run `beacon` and observe the command-line arguments.
 
 ## Example usage
 ### Azure Devops
-Using a public Azure Devops project and running continuously for definition id (ie. build) #1:
+Using a public Azure Devops project and running continuously for definition id (ie. build) #1 and #2:
 
-    beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --builds=1
+    beacon azuredevops --url https://dev.azure.com/my-public-project --project MyProject --builds=1 2
 
 Or, using a personal access token (e.g. 1234567890ab, see [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page) for how to obtain a token) and for all definitions:
 
