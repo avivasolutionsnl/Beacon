@@ -1,0 +1,13 @@
+name: PR
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Package
+      run: Build.Package.bat
