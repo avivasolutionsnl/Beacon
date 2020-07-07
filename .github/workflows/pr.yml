@@ -8,6 +8,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Package
+    - uses: microsoft/setup-msbuild@v1.0.0
       run: ./Build.Package.bat
