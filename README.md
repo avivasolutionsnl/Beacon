@@ -3,7 +3,7 @@
 
 # Beacon
 
-A monitoring tool for Azure DevOps and Teamcity that uses a Delcom USB LED light to notify your teams.
+A monitoring tool for Azure DevOps and Teamcity that uses a Delcom USB LED or Shelly Bulb light to notify your teams.
 
 ![Chocolate](./Images/Screenshot.png)
 
@@ -33,6 +33,14 @@ Using a named TeamCity account and running continuously:
 Or, alternatively using TeamCity guest access, running only once and with verbose logging:
 
     beacon teamcity --url=http://yourteamcity.com --guestaccess --runonce --verbose --builds=build_id_1 build_id_2 etc
+
+## Using a Shelly Bulb
+First install your Shelly Bulb following the installation [instructions](https://shelly.cloud/documents/user_guide/shelly_bulb.pdf).
+After your bulb is installed, look up the device IP address of it under "Settings > Device Information", e.g. 10.25.31.27.
+
+Now use the obtained IP to connect Shelly:
+
+    beacon azuredevops --url https://dev.azure.com/avivasolutions-public --project Nyxie --builds 10 --device shelly --shellyurl http://10.25.31.27
 
 ## Backlog
 
