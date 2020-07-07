@@ -10,7 +10,7 @@
 		Monitors Azure DevOps and TeamCity builds and uses that to control a Delcom USB LED light.
     </summary>
     <description>
-Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) to a Azure Devops build pipeline or a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
+Beacon is a little command-line tool that lets you connect a [Delcom USB RGB LED light](http://www.delcomproducts.com/products_usblmp.asp) or [Shelly Bulb](https://shelly.cloud/products/shelly-bulb-smart-home-automation-device/) to a Azure Devops build pipeline or a set of [TeamCity](https://www.jetbrains.com/teamcity/) builds and use that to get an irrefutable indication on whether those builds succeeded, failed or are under investigation.
 
 To get started just run the following command-line, for Azure DevOps and running continuously for definition id (ie. build) #1 and #2:
 
@@ -30,15 +30,15 @@ or, alternatively using TeamCity guest access and running only once with verbose
 
     </description>
     <language>en-US</language>
-    <licenseUrl>https://github.com/dennisdoomen/beacon/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/dennisdoomen/beacon</projectUrl>
-    <bugTrackerUrl>https://github.com/dennisdoomen/Beacon/issues</bugTrackerUrl>
-    <packageSourceUrl>https://github.com/dennisdoomen/beacon</packageSourceUrl>
-    <projectSourceUrl>https://github.com/dennisdoomen/beacon</projectSourceUrl>
+    <licenseUrl>https://github.com/avivasolutionsnl/beacon/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/avivasolutionsnl/beacon</projectUrl>
+    <bugTrackerUrl>https://github.com/avivasolutionsnl/Beacon/issues</bugTrackerUrl>
+    <packageSourceUrl>https://github.com/avivasolutionsnl/beacon</packageSourceUrl>
+    <projectSourceUrl>https://github.com/avivasolutionsnl/beacon</projectSourceUrl>
     <tags>azure devops teamcity build-monitoring delcom ci continuous integration</tags>
     <copyright>Copyright Aviva Solutions 2015-2020</copyright>
     <releaseNotes>
-Added Azure DevOps support.
+Added Azure DevOps and Shelly Bulb support.
     </releaseNotes>
   </metadata>
   <files>
