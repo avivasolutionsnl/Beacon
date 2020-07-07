@@ -10,4 +10,4 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Package
-      run: Build.Package.bat
+      run: powershell ./Build.Package.bat
