@@ -8,6 +8,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: microsoft/setup-msbuild@v1.0.0
     - name: Build
-      run: ./Build.Package.bat
+      run: nuke compile

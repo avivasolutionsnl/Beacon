@@ -32,16 +32,10 @@ or, alternatively using TeamCity guest access and running only once with verbose
     <language>en-US</language>
     <licenseUrl>https://github.com/avivasolutionsnl/beacon/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/avivasolutionsnl/beacon</projectUrl>
-    <bugTrackerUrl>https://github.com/avivasolutionsnl/Beacon/issues</bugTrackerUrl>
-    <packageSourceUrl>https://github.com/avivasolutionsnl/beacon</packageSourceUrl>
-    <projectSourceUrl>https://github.com/avivasolutionsnl/beacon</projectSourceUrl>
     <tags>azure devops teamcity build-monitoring delcom ci continuous integration</tags>
     <copyright>Copyright Aviva Solutions 2015-2020</copyright>
     <releaseNotes>
 Added Azure DevOps and Shelly Bulb support.
     </releaseNotes>
   </metadata>
-  <files>
-    <file src="Output\**" target="tools" />
-  </files>
 </package>

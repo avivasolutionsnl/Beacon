@@ -96,6 +96,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Beacon.nuspec" />
     <Content Include="DelcomDLL.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.Lights.Tester", "Beacon.Lights.Tester\Beacon.Lights.Tester.csproj", "{33AEE6F9-C15A-4DBA-8091-2919748EA0B1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\build\_build.csproj", "{E7F39104-A669-452A-9F3D-6ACA7EC74FA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,8 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E7F39104-A669-452A-9F3D-6ACA7EC74FA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7F39104-A669-452A-9F3D-6ACA7EC74FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E76813EF-60AD-4955-A273-C2A235DFE9FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E76813EF-60AD-4955-A273-C2A235DFE9FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E76813EF-60AD-4955-A273-C2A235DFE9FC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
