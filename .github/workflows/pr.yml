@@ -8,5 +8,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Fetch unshallow
+      run: git fetch --prune --tags --unshallow
+
     - name: Build
       run: ./build.ps1 compile
