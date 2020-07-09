@@ -48,9 +48,8 @@ class Build : NukeBuild
     Target Restore => _ => _
         .Executes(() =>
         {
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Restore"));
+            NuGetRestore(s => s
+                .SetTargetPath(SourceDirectory));
         });
 
     Target Compile => _ => _
