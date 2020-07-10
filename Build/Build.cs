@@ -35,7 +35,14 @@ class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
 
-    AbsolutePath OutputDirectory => RootDirectory / "output";
+    [PathExecutable]
+    readonly Tool Choco;
+    
+    [PathExecutable(name: "7z")]
+    readonly Tool Zip;
+    
+    AbsolutePath OutputDirectory => PackageDirectory / "Output";
+    AbsolutePath PackageDirectory => RootDirectory / "Package";
     AbsolutePath SourceDirectory => RootDirectory / "Sources";
 
     Target Clean => _ => _
@@ -71,10 +78,15 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            NuGetPack(s => s
-                .SetVersion(GitVersion.NuGetVersion)
-                .SetTargetPath(SourceDirectory / "Beacon" / "Beacon.nuspec")
-                .SetOutputDirectory(OutputDirectory));
+            // Pack the artifacts such that these can be published using Chocolatey            
+            CopyFile(RootDirectory / "LICENSE", OutputDirectory / "LICENSE", FileExistsPolicy.Overwrite);
+            CopyFile(RootDirectory / "README.md", OutputDirectory / "README.md", FileExistsPolicy.Overwrite);
+            CopyFile(RootDirectory / "VERIFICATION.txt", OutputDirectory / "VERIFICATION.txt", FileExistsPolicy.Overwrite);
+            
+            var zipFilename = $"Beacon.{GitVersion.NuGetVersion}.zip";
+            Zip($"a -r {OutputDirectory / zipFilename} {SourceDirectory / "Beacon" / "bin" / Configuration / "*"} -y");
+            
+            Choco($"pack {PackageDirectory / "Beacon.nuspec"} --version {GitVersion.NuGetVersion}", workingDirectory: PackageDirectory);
         });
 
 }

@@ -38,4 +38,7 @@ or, alternatively using TeamCity guest access and running only once with verbose
 Added Azure DevOps and Shelly Bulb support.
     </releaseNotes>
   </metadata>
+    <files>
+        <file src="Output\**" target="tools" />
+    </files>
 </package>
