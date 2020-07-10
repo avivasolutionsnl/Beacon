@@ -14,4 +14,14 @@
     <PackageDownload Include="GitVersion.Tool" Version="[5.1.1]" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="..\.github\workflows\release.yml">
+      <Link>ci\release.yml</Link>
+    </None>
+    <None Update="..\.github\workflows\ci.yml">
+      <LinkBase>ci\</LinkBase>
+      <Link>ci\ci.yml</Link>
+    </None>
+  </ItemGroup>
+
 </Project>

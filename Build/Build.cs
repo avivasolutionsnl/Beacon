@@ -31,6 +31,8 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
+    [Parameter("Chocolatey API key")] readonly string ChocoApiKey;
+
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
@@ -89,4 +91,12 @@ class Build : NukeBuild
             Choco($"pack {PackageDirectory / "Beacon.nuspec"} --version {GitVersion.NuGetVersion}", workingDirectory: PackageDirectory);
         });
 
+    Target Publish =>
+        _ => _
+            .DependsOn(Pack)
+            .Executes(() =>
+            {
+                var zipFilename = $"Beacon.{GitVersion.NuGetVersion}.zip";
+                Choco($"push {PackageDirectory / zipFilename} --apiKey={ChocoApiKey}", workingDirectory: PackageDirectory);
+            });
 }

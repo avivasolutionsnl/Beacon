@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Fetch unshallow
+      run: git fetch --prune --tags --unshallow
+
+    - name: Build
+      run: ./build.ps1 publish --chocoApiKey="$CHOCO_API_KEY"
+      env:
+        CHOCO_API_KEY: ${{ secrets.ChocoApiKey }}
