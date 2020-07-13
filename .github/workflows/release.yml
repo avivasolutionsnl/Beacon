@@ -16,6 +16,6 @@ jobs:
       run: git fetch --prune --tags --unshallow
 
     - name: Build
-      run: ./build.ps1 publish --chocoApiKey="$CHOCO_API_KEY"
+      run: ./build.ps1 publish --chocoApiKey "$CHOCO_API_KEY"
       env:
-        CHOCO_API_KEY: ${{ secrets.ChocoApiKey }}
+        CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}

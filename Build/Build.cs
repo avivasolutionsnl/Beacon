@@ -96,7 +96,7 @@ class Build : NukeBuild
             .DependsOn(Pack)
             .Executes(() =>
             {
-                var zipFilename = $"Beacon.{GitVersion.NuGetVersion}.zip";
-                Choco($"push {PackageDirectory / zipFilename} --apiKey={ChocoApiKey}", workingDirectory: PackageDirectory);
+                var filename = $"Beacon.{GitVersion.NuGetVersion}.nupkg";
+                Choco($"push {PackageDirectory / filename} --apiKey={ChocoApiKey}", workingDirectory: PackageDirectory);
             });
 }
