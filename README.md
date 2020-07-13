@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD041 -->
-![](https://github.com/avivasolutionsnl/Beacon/workflows/.github/workflows/CI/badge.svg)
+![CI](https://github.com/avivasolutionsnl/Beacon/workflows/CI/badge.svg?branch=master)
 
 # Beacon
 
