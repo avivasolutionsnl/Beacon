@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD041 -->
-[![Build status](https://ci.appveyor.com/api/projects/status/sm9eoe5qd48b44ay?svg=true)](https://ci.appveyor.com/project/dennisdoomen/beacon)
+![](https://github.com/avivasolutionsnl/Beacon/workflows/.github/workflows/ci.yml/badge.svg)
 
 # Beacon
 
