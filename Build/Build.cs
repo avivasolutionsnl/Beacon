@@ -84,9 +84,7 @@ class Build : NukeBuild
             CopyFile(RootDirectory / "LICENSE", OutputDirectory / "LICENSE", FileExistsPolicy.Overwrite);
             CopyFile(RootDirectory / "README.md", OutputDirectory / "README.md", FileExistsPolicy.Overwrite);
             CopyFile(RootDirectory / "VERIFICATION.txt", OutputDirectory / "VERIFICATION.txt", FileExistsPolicy.Overwrite);
-            
-            var zipFilename = $"Beacon.{GitVersion.NuGetVersion}.zip";
-            Zip($"a -r {OutputDirectory / zipFilename} {SourceDirectory / "Beacon" / "bin" / Configuration / "*"} -y");
+            CopyDirectoryRecursively(SourceDirectory / "Beacon" / "bin" / Configuration, OutputDirectory, DirectoryExistsPolicy.Merge);
             
             Choco($"pack {PackageDirectory / "Beacon.nuspec"} --version {GitVersion.NuGetVersion}", workingDirectory: PackageDirectory);
         });
