@@ -61,6 +61,20 @@ class Build : NukeBuild
                 .SetTargetPath(SourceDirectory));
         });
 
+    Target RunGitVersion =>
+        _ => _
+            .Before(Compile)
+            .Executes(() =>
+            {
+                var updateAssemblyInfo = IsServerBuild; // Only update AssemblyInfo.cs files on server, to avoid local changes
+
+                GitVersionTasks.GitVersion(c => c
+                    .SetFramework("netcoreapp3.0")
+                    .SetUpdateAssemblyInfo(updateAssemblyInfo)
+                    .SetWorkingDirectory(RootDirectory)
+                );
+            });
+    
     Target Compile => _ => _
         .DependsOn(Restore)
         .Executes(() =>
