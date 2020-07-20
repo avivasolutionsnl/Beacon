@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 using Beacon.Core;
@@ -90,11 +91,13 @@ namespace Beacon
         
         private static void HandleParseErrors(ParserResult<object> result, IEnumerable<Error> errors)
         {
+            var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+           
             var helpText = new HelpText
             {
                 AddDashesToOption = true,
                 AdditionalNewLineAfterOption = true,
-                Copyright = new CopyrightInfo("Aviva Solutions", 2015, 2020).ToString(),
+                Copyright = versionInfo.LegalCopyright,
                 Heading = new HeadingInfo("Beacon: TeamCity Monitor", Assembly.GetExecutingAssembly().GetName().Version.ToString())
             };
 
