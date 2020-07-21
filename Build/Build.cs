@@ -63,7 +63,6 @@ class Build : NukeBuild
 
     Target RunGitVersion =>
         _ => _
-            .Before(Compile)
             .Executes(() =>
             {
                 var updateAssemblyInfo = IsServerBuild; // Only update AssemblyInfo.cs files on server, to avoid local changes
@@ -76,7 +75,7 @@ class Build : NukeBuild
             });
     
     Target Compile => _ => _
-        .DependsOn(Restore)
+        .DependsOn(Restore, RunGitVersion)
         .Executes(() =>
         {
             MSBuild(s => s
